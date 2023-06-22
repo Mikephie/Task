@@ -2,14 +2,14 @@
  * 监控汇率变化
  * @author: Peng-YM
  * @Alter: Mikephie
- * 更新地址：https://raw.githubusercontent.com/chxm1023/Task/main/hljk.js
+ * 更新地址：https://raw.githubusercontent.com/Mikephie/Task/main/hljk.js
  * 配置方法：
  * 1. 设置基准货币，默认新币(SGD)。
  * 2. 设置保留几位小数。
  * @update ：YangZhaocool
 
 [task_local]
-10 0 * * ? https://raw.githubusercontent.com/chxm1023/Task/main/hljk.js, tag=汇率监控, img-url=https://raw.githubusercontent.com/chxm1023/Task/main/icon/hljk.png, enabled=true
+10 0 * * ? https://raw.githubusercontent.com/Mikephie/Task/main/hljk.js, tag=汇率监控, img-url=https://raw.githubusercontent.com/chxm1023/Task/main/icon/hljk.png, enabled=true
 
 ****************************************/
 
