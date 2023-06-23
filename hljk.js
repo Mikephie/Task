@@ -9,16 +9,16 @@
  * @update ：YangZhaocool
 
 [task_local]
-10 0 * * ? https://raw.githubusercontent.com/chxm1023/Task/main/hljk.js, tag=汇率监控, img-url=https://raw.githubusercontent.com/chxm1023/Task/main/icon/hljk.png, enabled=true
+10 0 * * ? https://raw.githubusercontent.com/Mikephie/Task/main/hljk.js, tag=汇率监控, img-url=https://raw.githubusercontent.com/chxm1023/Task/main/icon/hljk.png, enabled=true
 
 ****************************************/
 
-const base = "CNY"; // 基准货币，可以改成其他币种
+const base = "SGD"; // 基准货币，可以改成其他币种
 const digits = 3; // 保留几位有效数字
 
 const $ = API("exchange");
 const currencyNames = {
-    CNY: ["人民币", "🇨🇳"],
+    SGD: ["新加坡币", "🇸🇬"],
     USD: ["美元", "🇺🇸"],
     EUR: ["欧元", "🇪🇺"],
     GBP: ["英镑", "🇬🇧"],
@@ -28,7 +28,7 @@ const currencyNames = {
     THB: ["泰铢", "🇹🇭"],
     RUB: ["卢布", "🇷🇺"],
     VND: ["越南盾", "🇻🇳"],
-    TWD: ["新台币", "🇨🇳"],
+    CNY: ["人民币", "🇨🇳"],
     TRY: ["土耳其里拉", "🇹🇷"],
     ZWL: ["津巴布韦币", "🇿🇼"],
     MYR: ["马来西亚林吉特", "🇲🇾"],
@@ -36,7 +36,7 @@ const currencyNames = {
 
 
 $.http.get({
-    url: "https://api.exchangerate-api.com/v4/latest/CNY"
+    url: "https://api.exchangerate-api.com/v4/latest/SGD"
 })
     .then((response) => {
         const data = JSON.parse(response.body);
