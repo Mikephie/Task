@@ -5,13 +5,17 @@
 
 //新币汇率监控
 cron "0 8,10 * * ?" script-path=https://raw.githubusercontent.com/Mikephie/Task/main/hljk.js, timeout=60, tag=新币汇率监控, img-url=https://raw.githubusercontent.com/fmz200/wool_scripts/main/icons/apps/ql_logo.png
+
 //酷我音乐签到
-cron "30 10,20 * * *" script-path=https://raw.githubusercontent.com/MCdasheng/QuantumultX/main/Scripts/myScripts/kuwo.js, timeout=60, tag=🎵酷我音乐, img-url=https://raw.githubusercontent.com/fmz200/wool_scripts/main/icons/apps/Category_Music.
+https\:\/\/integralapi\.kuwo\.cn\/api\/v1\/online\/sign\/v1\/earningSignIn\/.* url script-request-header https://raw.githubusercontent.com/MCdasheng/QuantumultX/main/Scripts/myScripts/kuwo.cookie.js
+
 # BiliBili cookie
 ^https?:\/\/app\.bilibili\.com\/x\/resource\/fingerprint\? url script-request-header https://raw.githubusercontent.com/ClydeTime/Quantumult/main/Script/Task/BiliBili.js
 ^https?:\/\/m.bilibili.com/$ url script-request-header https://raw.githubusercontent.com/ClydeTime/Quantumult/main/Script/Task/BiliBili.js
+
 //TestFlight自动加入
 cron "0 * * * *" script-path=https://raw.githubusercontent.com/MCdasheng/QuantumultX/main/Scripts/myScripts/TestFlight.js, timeout=60, tag=TestFlight自动加入
+
 //阿里云签到
 ^https:\/\/(auth|aliyundrive)\.alipan\.com\/v2\/account\/token url script-request-body https://gist.githubusercontent.com/Sliverkiss/33800a98dcd029ba09f8b6fc6f0f5162/raw/aliyun.js
 
