@@ -15,4 +15,4 @@ cron "0 * * * *" script-path=https://raw.githubusercontent.com/MCdasheng/Quantum
 //阿里云签到
 cron "0 7,11 * * *" script-path=https://gist.githubusercontent.com/Sliverkiss/33800a98dcd029ba09f8b6fc6f0f5162/raw/aliyun.js, timeout=60, tag=阿里云任务, img-url=https://raw.githubusercontent.com/fmz200/wool_scripts/main/icons/softlyx/ALiYun.png
 
-hostname = passport.iqiyi.com, www.52pojie.cn, tiebac.baidu.com, c.tieba.baidu.com, app.bilibili.com, m.bilibili.com, xmc.ximalaya.com, ngabbs.com, iacc.rec.qq.com
+hostname = app.bilibili.com, m.bilibili.com, xmc.ximalaya.com, ngabbs.com, iacc.rec.qq.com
