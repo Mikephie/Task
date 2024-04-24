@@ -3,7 +3,7 @@
 #!author=@Mike
 #!icon=https://raw.githubusercontent.com/Mikephie/icons/main/loon/qiandao.png
 
-[Script]
+[rewrite_local]
 
 # 酷我音乐签到
 http-request ^https\:\/\/integralapi\.kuwo\.cn\/api\/v1\/online\/sign\/v1\/earningSignIn\/.* script-path=https://raw.githubusercontent.com/MCdasheng/QuantumultX/main/Scripts/myScripts/kuwo.cookie.js, timeout=60, tag=kuwo.cookie
