@@ -33,4 +33,4 @@ TestFlight Cookie = type=http-request, pattern=^https:\/\/testflight\.apple\.com
 阿里云盘Token = type=http-request, pattern=^https:\/\/(auth|aliyundrive)\.alipan\.com\/v2\/account\/token, script-path=https://gist.githubusercontent.com/Sliverkiss/33800a98dcd029ba09f8b6fc6f0f5162/raw/aliyun.js, requires-body=true, max-size=-1, timeout=60
 
 [MITM]
-hostname = %APPEND% app.bilibili.com, m.bilibili.com, xmc.ximalaya.com, ngabbs.com, iacc.rec.qq.com, c.tieba.baidu.com, tiebac.baidu.com, integralapi.kuwo.cn, testflight.apple.com, dache.amap.com, auth.alipan.com, auth.aliyundrive.com
+hostname = %APPEND% app.bilibili.com, m.bilibili.com, xmc.ximalaya.com, ngabbs.com, iacc.rec.qq.com, c.tieba.baidu.com, tiebac.baidu.com, integralapi.kuwo.cn, appi.kuwo.cn, testflight.apple.com, dache.amap.com, auth.alipan.com, auth.aliyundrive.com

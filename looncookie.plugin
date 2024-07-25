@@ -27,4 +27,4 @@ http-request ^https:\/\/(auth|aliyundrive)\.alipan\.com\/v2\/account\/token scri
 http-request https:\/\/www\.52pojie\.cn\/home\.php\? script-path=https://raw.githubusercontent.com/ClydeTime/Quantumult/main/Script/Task/52pojie.js, timeout=60, tag=52pojie
 
 [MITM]
-hostname = app.bilibili.com, m.bilibili.com, auth.alipan.com, auth.aliyundrive.com, integralapi.kuwo.cn, testflight.apple.com, www.52pojie.cn, *.y.qq.com
+hostname = app.bilibili.com, m.bilibili.com, auth.alipan.com, auth.aliyundrive.com, integralapi.kuwo.cn, appi.kuwo.cn, testflight.apple.com, www.52pojie.cn, *.y.qq.com
