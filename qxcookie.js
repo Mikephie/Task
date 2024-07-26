@@ -21,4 +21,4 @@ https:\/\/integralapi\.kuwo\.cn\/api\/v1\/online\/sign\/v1\/music\/userBase\? ur
 
 
 [MITM]
-hostname = app.bilibili.com, m.bilibili.com, auth.alipan.com, auth.aliyundrive.com, integralapi.kuwo.cn, appi.kuwo.cn, testflight.apple.com
+hostname = auth.alipan.com, auth.aliyundrive.com, integralapi.kuwo.cn, appi.kuwo.cn, testflight.apple.com
