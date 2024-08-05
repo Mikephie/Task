@@ -17,7 +17,7 @@ Boxjs恢复 = type=cron,cronexp=5 10 * * *,script-path=https://raw.githubusercon
 Boxjs更新历史 = type=cron,cronexp=8 10 * * *,script-path=https://raw.githubusercontent.com/dompling/Script/master/gist/commit.js,timeout=60,wake-system=1
 
 # 🎵酷我音乐刷积分
-🎵酷我音乐刷积分 = type=cron,cronexp="0 9,11,13,15,17,19,21 * * *",script-path=https://raw.githubusercontent.com/General74110/Quantumult-X/master/Task/kuwo.js,timeout=3000,wake-system=1
+🎵酷我音乐刷积分 = type=cron,cronexp="0 9,11,13,15,17,19,21 * * *",script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kuwocoin.js,timeout=3000,wake-system=1
 
 # 酷我音乐刷时长
 🎵酷我音乐刷时长 = type=cron,cronexp=30 6 * * *,script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kuwotimes.js,timeout=3600
