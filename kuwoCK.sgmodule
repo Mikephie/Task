@@ -1,0 +1,13 @@
+#!name=🌸 Record ▸ kuwoCK
+#!category=Record module
+#!desc=kuwoCK重放及获取token脚本
+#!arguments=scriptName:kuwoCK,ckName:loginuid,cron:30 0 * * *,hostname:integralapi.kuwo.cn,regx:^https:\/\/integralapi\.kuwo\.cn\/api\/v1\/online\/sign\/v1\/earningSignIn\/newUserSignList\?loginUid=373245224&loginSid=2006108633&devId=0621c1ca52314a57a731dbcc917f0d03&appUid=2594487272&apiVer=3&source=kwplayer_ip_10\.9\.0\.0_TJ\.ipa&function=1&terminal=2&version=10\.9\.0\.0&scoreInfo=&apiv=3&t=0\.3476961148867673,path:"",isGetCookie:1
+#!arguments-desc= ☆　　╱╲*╱╲　☆\n ╱╳+▲╱　　╲　☆\n╱╱ ◢◣+　　╳╲ \n╱ +◢█◣　／　　╲☆\n☆　◢██◣   Sakura \n _▂▂█▂▂   樱花交流会·2.0.0 \n若是对你有所帮助～不妨点个star🌟!:|\n\n[参数设置]\n ├ name: 脚本名称，默认由捷径生成\n ├ ckName: 变量名称，默认由捷径生成\n ├ cron: 定时运行，默认30 0 * * *\n ├ hostname: mitm域名，默认由捷径生成\n ├ regx: 匹配正则，默认由捷径生成\n ├ isGetCookie:获取ck开关，0关闭，1打开\n └ path:通知result的子路径，为空则返回全部 \n\n[脚本说明]\n├作者: @Sliverkiss\n├频道: @sliverkiss_blog\n└致谢: @mieqq、@xream、@id77
+
+[Script]
+{{{scriptName}}}_获取cookie = type=http-request,pattern={{{regx}}},script-path=https://raw.githubusercontent.com/Sliverkiss/GoodNight/master/Script/surgeRecord.js,requires-body=1,max-size=0,argument="scriptName={{{scriptName}}}&ckName={{{ckName}}}"
+
+{{{scriptName}}} = type=cron,cronexp="{{{cron}}}",script-path=https://raw.githubusercontent.com/Sliverkiss/GoodNight/master/Script/surgeRecord.js,script-update-interval=0,timeout=3600,wake-system=1,engine=jsc,argument="scriptName={{{scriptName}}}&ckName={{{ckName}}}&path={{{path}}}&isGetCookie={{{isGetCookie}}}"
+
+[MITM]
+hostname = %APPEND% {{{hostname}}}
