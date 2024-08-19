@@ -30,7 +30,7 @@ TestFlight Cookie = type=http-request, pattern=^https:\/\/testflight\.apple\.com
 
 酷我音乐刷时长获取Cookie = type=http-request, pattern=^https:\/\/integralapi\.kuwo\.cn\/api\/v1\/online\/sign\/v1\/music\/userBase\?, script-path=https://raw.githubusercontent.com/General74110/Quantumult-X/master/Task/Kuwomusic.js, requires-body=true, timeout=60
 
-酷狗概念版数据Cookie = type=http-request,pattern=https://gateway.kugou.com/youth/v1/(recharge/receive_vip_listen_song|activity/get_month_vip_record).*,requires-body=0,script-path=https://gist.githubusercontent.com/Alex0510/1c389019c264a7d3ddbe4dbcf77d4295/raw/kugou.js, requires-body=true, timeout=60
+酷狗概念版数据Cookie = type=http-request,pattern=https://gateway.kugou.com/youth/v1/(recharge/receive_vip_listen_song|activity/get_month_vip_record).*,requires-body=0,script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kugou.js, requires-body=true, timeout=60
 
 阿里云盘Token = type=http-request, pattern=^https:\/\/(auth|aliyundrive)\.alipan\.com\/v2\/account\/token, script-path=https://gist.githubusercontent.com/Sliverkiss/33800a98dcd029ba09f8b6fc6f0f5162/raw/aliyun.js, requires-body=true, max-size=-1, timeout=60
 
