@@ -22,7 +22,7 @@ Boxjs更新历史 = type=cron,cronexp=8 10 * * *,script-path=https://raw.githubu
 # 酷我音乐刷时长
 🎵酷我音乐刷时长 = type=cron,cronexp=30 6 * * *,script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kuwotimes.js,timeout=3600
 
-# 酷我音乐刷时长
+# 酷狗概念版自动领取VIP
 🎵酷我音乐刷时长 = type=cron,cronexp=30 6 * * *,script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kuwotimes.js,timeout=3600
 
 # TF监控
