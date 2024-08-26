@@ -33,4 +33,4 @@ http-request ^https:\/\/(auth|aliyundrive)\.alipan\.com\/v2\/account\/token scri
 http-request ^https:\/\/.+\/emby\/Sessions\/Playing\/Stopped script-path=https://raw.githubusercontent.com/ZenmoFeiShi/Qx/main/Emby.js, requires-body=true, timeout=60, tag=Emby
 
 [MITM]
-hostname = app.bilibili.com, m.bilibili.com, auth.alipan.com, auth.aliyundrive.com, integralapi.kuwo.cn, appi.kuwo.cn, testflight.apple.com, -*.fileball.app, .*
+hostname = app.bilibili.com, m.bilibili.com, auth.alipan.com, auth.aliyundrive.com, integralapi.kuwo.cn, appi.kuwo.cn, testflight.apple.com, -*.fileball.app
