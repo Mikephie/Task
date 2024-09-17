@@ -9,7 +9,7 @@
  * @update ：YangZhaocool
 
 [task_local]
-10 0 * * ? https://raw.githubusercontent.com/Mikephie/Task/main/hljk.js, tag=汇率监控, img-url=https://raw.githubusercontent.com/chxm1023/Task/main/icon/hljk.png, enabled=true
+0 8,9 * * ? https://raw.githubusercontent.com/Mikephie/Task/main/hljk.js, tag=汇率监控, img-url=https://raw.githubusercontent.com/chxm1023/Task/main/icon/hljk.png, enabled=true
 
 ****************************************/
 
