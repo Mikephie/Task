@@ -1,57 +1,54 @@
-//Thu Jan 09 2025 04:16:12 GMT+0000 (Coordinated Universal Time)
-//Base:https://github.com/echo094/decode-js
-//Modify:https://github.com/smallfawn/decode_action
-const ill11iii = new Env("酷狗概念版自动领取VIP-Eric");
-if ($request.url) {
-  let i1lIIii1 = $request.url,
-    i1lIllI1 = $request.headers,
-    Il11lI1 = new URLSearchParams(i1lIIii1.split("?")[1]),
-    IIIiiili = {
-      "appid": Il11lI1.get("appid"),
-      "clientver": Il11lI1.get("clientver"),
-      "clienttime": Il11lI1.get("clienttime"),
-      "mid": Il11lI1.get("mid"),
-      "uuid": Il11lI1.get("uuid"),
-      "dfid": Il11lI1.get("dfid"),
-      "token": Il11lI1.get("token"),
-      "userid": Il11lI1.get("userid"),
-      "srcappid": Il11lI1.get("srcappid"),
-      "signature": Il11lI1.get("signature")
-    },
-    IIlii = {
-      ":authority": i1lIllI1[":authority"],
-      "content-type": i1lIllI1["content-type"],
-      "kg-rf": i1lIllI1["kg-rf"],
-      "accept": i1lIllI1.accept,
-      "kg-thash": i1lIllI1["kg-thash"],
-      "accept-language": i1lIllI1["accept-language"],
-      "accept-encoding": i1lIllI1["accept-encoding"],
-      "kg-rec": i1lIllI1["kg-rec"],
-      "user-agent": i1lIllI1["user-agent"],
-      "kg-rc": i1lIllI1["kg-rc"],
-      "kg-fake": i1lIllI1["kg-fake"],
-      "content-length": i1lIllI1["content-length"],
-      "uni-useragent": i1lIllI1["uni-useragent"]
-    };
-  function IlI1Illi(iliIlii, IiiI1lI) {
-    if (typeof $prefs !== "undefined") return $prefs.setValueForKey(JSON.stringify(IiiI1lI), iliIlii);else {
-      if (typeof $persistentStore !== "undefined") return $persistentStore.write(JSON.stringify(IiiI1lI), iliIlii);else {
-        if (typeof $persistent !== "undefined") {
-          return $persistent.setItem(iliIlii, JSON.stringify(IiiI1lI));
-        }
-      }
+const l1IIil = new Env("酷狗概念版自动领取VIP");
+function il11ii1(iIlliii) {
+  if (typeof $prefs !== "undefined") return JSON.parse($prefs.valueForKey(iIlliii)) || {};else {
+    if (typeof $persistentStore !== "undefined") return JSON.parse($persistentStore.read(iIlliii)) || {};else {
+      if (typeof $persistent !== "undefined") return JSON.parse($persistent.getItem(iIlliii)) || {};
     }
   }
-  IlI1Illi("urlParams", IIIiiili);
-  IlI1Illi("headerParams", IIlii);
-  IlI1Illi("originalUrl", i1lIIii1);
-  ill11iii.log("保存的 URL Params:", JSON.stringify(IIIiiili));
-  ill11iii.log("保存的 Header Params:", JSON.stringify(IIlii));
-  ill11iii.log("保存的 Original URL:", i1lIIii1);
-  ill11iii.log("数据已保存到持久化存储-Eric为您提供");
-  ill11iii.msg("获取数据成功", "数据已持久化保存", "");
-  ill11iii.done();
+  return {};
 }
+let IliIIII = il11ii1("urlParams"),
+  i1IIllil = il11ii1("headerParams"),
+  I1IiIiIl = il11ii1("originalUrl"),
+  iI1111iI = "https://gateway.kugou.com/youth/v1/recharge/receive_vip_listen_song?appid=" + IliIIII.appid + "&clientver=" + IliIIII.clientver + "&clienttime=" + IliIIII.clienttime + "&mid=" + IliIIII.mid + "&uuid=" + IliIIII.uuid + "&dfid=" + IliIIII.dfid + "&token=" + IliIIII.token + "&userid=" + IliIIII.userid + "&srcappid=" + IliIIII.srcappid + "&signature=" + IliIIII.signature,
+  IiiliI = {
+    ":authority": i1IIllil[":authority"],
+    "content-type": i1IIllil["content-type"],
+    "kg-rf": i1IIllil["kg-rf"],
+    "accept": i1IIllil.accept,
+    "kg-thash": i1IIllil["kg-thash"],
+    "accept-language": i1IIllil["accept-language"],
+    "accept-encoding": i1IIllil["accept-encoding"],
+    "kg-rec": i1IIllil["kg-rec"],
+    "user-agent": i1IIllil["user-agent"],
+    "kg-rc": i1IIllil["kg-rc"],
+    "kg-fake": i1IIllil["kg-fake"],
+    "content-length": i1IIllil["content-length"],
+    "uni-useragent": i1IIllil["uni-useragent"]
+  };
+const l1I1Il1 = {
+  "url": iI1111iI,
+  "headers": IiiliI
+};
+l1IIil.post(l1I1Il1, function (l11iili1, iIlil11l, liI1Iiii) {
+  if (l11iili1) {
+    {
+      l1IIil.log("请求出错:", l11iili1);
+      l1IIil.done();
+      return;
+    }
+  }
+  try {
+    l1IIil.log(liI1Iiii);
+    const liI111I = JSON.parse(liI1Iiii);
+    liI111I.status === 1 ? l1IIil.msg("获取成功", "成功领取VIP", "") : l1IIil.msg("获取失败", "当天已领取无需再领", "");
+  } catch (l1ii1Ill) {
+    l1IIil.log("解析响应数据出错:", l1ii1Ill);
+    l1IIil.msg("解析失败", "无法解析服务器返回的数据", "");
+  } finally {
+    l1IIil.done();
+  }
+});
 function Env(t, e) {
   class s {
     constructor(t) {
@@ -574,4 +571,3 @@ function Env(t, e) {
     }
   }(t, e);
 }
-去;
