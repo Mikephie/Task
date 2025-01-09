@@ -1,67 +1,152 @@
-// 脚本名称：数据捕获与存储脚本
-const Env = new class {
-    constructor(name) {
-        this.name = name;
-        this.startTime = new Date().getTime();
-    }
-    msg(title, subtitle = "", message = "") {
-        if (typeof $notification !== "undefined") {
-            $notification.post(title, subtitle, message);
-        } else {
-            console.log(`${title}\n${subtitle}\n${message}`);
-        }
-    }
-    log(message) {
-        console.log(`[${this.name}] ${message}`);
-    }
-    setdata(key, value) {
-        if (typeof $persistentStore !== "undefined") {
-            return $persistentStore.write(value, key); // Surge, Loon 持久化存储
-        } else if (typeof $prefs !== "undefined") {
-            return $prefs.setValueForKey(value, key); // Quantumult X 持久化存储
-        } else {
-            this.log("不支持的环境，无法存储数据。");
-            return false;
-        }
-    }
-    getdata(key) {
-        if (typeof $persistentStore !== "undefined") {
-            return $persistentStore.read(key);
-        } else if (typeof $prefs !== "undefined") {
-            return $prefs.valueForKey(key);
-        } else {
-            this.log("不支持的环境，无法读取数据。");
-            return null;
-        }
-    }
-    done() {
-        const endTime = new Date().getTime();
-        this.log(`脚本执行完毕，用时 ${(endTime - this.startTime) / 1000} 秒`);
-    }
-}("数据捕获脚本");
+const envInstance = new Env("酷狗概念版自动领取VIP-Eric");
 
-// 获取请求内容
-const requestBody = $request.body || "{}"; // 获取请求 Body
-const requestHeaders = $request.headers || {}; // 获取请求头
-Env.log(`捕获到的 Body: ${requestBody}`);
-Env.log(`捕获到的 Headers: ${JSON.stringify(requestHeaders)}`);
+if ($request.url) {
+  let requestUrl = $request.url,
+      requestHeaders = $request.headers,
+      urlParams = new URLSearchParams(requestUrl.split("?")[1]),
+      parsedParams = {
+        "appid": urlParams.get("appid"),
+        "clientver": urlParams.get("clientver"),
+        "clienttime": urlParams.get("clienttime"),
+        "mid": urlParams.get("mid"),
+        "uuid": urlParams.get("uuid"),
+        "dfid": urlParams.get("dfid"),
+        "token": urlParams.get("token"),
+        "userid": urlParams.get("userid"),
+        "srcappid": urlParams.get("srcappid"),
+        "signature": urlParams.get("signature")
+      },
+      parsedHeaders = {
+        ":authority": requestHeaders[":authority"],
+        "content-type": requestHeaders["content-type"],
+        "kg-rf": requestHeaders["kg-rf"],
+        "accept": requestHeaders.accept,
+        "kg-thash": requestHeaders["kg-thash"],
+        "accept-language": requestHeaders["accept-language"],
+        "accept-encoding": requestHeaders["accept-encoding"],
+        "kg-rec": requestHeaders["kg-rec"],
+        "user-agent": requestHeaders["user-agent"],
+        "kg-rc": requestHeaders["kg-rc"],
+        "kg-fake": requestHeaders["kg-fake"],
+        "content-length": requestHeaders["content-length"],
+        "uni-useragent": requestHeaders["uni-useragent"]
+      };
 
-// 数据存储逻辑
-const keyName = "captured_request_data"; // 存储键名
-const saveData = {
-    body: requestBody,
-    headers: requestHeaders,
-    timestamp: new Date().toISOString(),
-};
+  function saveData(key, value) {
+    if (typeof $prefs !== "undefined") {
+      return $prefs.setValueForKey(JSON.stringify(value), key);
+    } else if (typeof $persistentStore !== "undefined") {
+      return $persistentStore.write(JSON.stringify(value), key);
+    } else if (typeof $persistent !== "undefined") {
+      return $persistent.setItem(key, JSON.stringify(value));
+    }
+  }
 
-// 将数据保存到本地持久化存储
-const result = Env.setdata(keyName, JSON.stringify(saveData, null, 2));
+  saveData("urlParams", parsedParams);
+  saveData("headerParams", parsedHeaders);
+  saveData("originalUrl", requestUrl);
 
-// 通知结果
-if (result) {
-    Env.msg("数据保存成功", "请求内容已保存到本地", `存储键: ${keyName}`);
-} else {
-    Env.msg("数据保存失败", "请检查存储权限或空间", "");
+  envInstance.log("保存的 URL Params:", JSON.stringify(parsedParams));
+  envInstance.log("保存的 Header Params:", JSON.stringify(parsedHeaders));
+  envInstance.log("保存的 Original URL:", requestUrl);
+  envInstance.log("数据已保存到持久化存储 - Eric 为您提供");
+  envInstance.msg("获取数据成功", "数据已持久化保存", "");
+  envInstance.done();
 }
 
-Env.done();
+// 环境封装类
+function Env(name, options) {
+  class HTTPClient {
+    constructor(env) {
+      this.env = env;
+    }
+    send(request, method = "GET") {
+      request = typeof request === "string" ? { url: request } : request;
+      let handler = this.get;
+      if (method === "POST") handler = this.post;
+      return new Promise((resolve, reject) => {
+        handler.call(this, request, (err, response, body) => {
+          err ? reject(err) : resolve(response);
+        });
+      });
+    }
+    get(request) {
+      return this.send.call(this.env, request);
+    }
+    post(request) {
+      return this.send.call(this.env, request, "POST");
+    }
+  }
+
+  return new (class {
+    constructor(name, options) {
+      this.name = name;
+      this.http = new HTTPClient(this);
+      this.data = null;
+      this.dataFile = "box.dat";
+      this.logs = [];
+      this.isMute = false;
+      this.isNeedRewrite = false;
+      this.logSeparator = "\n";
+      this.encoding = "utf-8";
+      this.startTime = new Date().getTime();
+      Object.assign(this, options);
+      this.log("", `🔔${this.name}, 开始!`);
+    }
+
+    getEnv() {
+      if (typeof $environment !== "undefined") {
+        if ($environment["surge-version"]) return "Surge";
+        if ($environment["stash-version"]) return "Stash";
+      }
+      if (typeof module !== "undefined" && module.exports) return "Node.js";
+      if (typeof $task !== "undefined") return "Quantumult X";
+      if (typeof $loon !== "undefined") return "Loon";
+      if (typeof $rocket !== "undefined") return "Shadowrocket";
+      return undefined;
+    }
+
+    log(...messages) {
+      if (messages.length > 0) {
+        this.logs = [...this.logs, ...messages];
+        console.log(messages.join(this.logSeparator));
+      }
+    }
+
+    logErr(err) {
+      this.log("", `❗️${this.name}, 错误!`, err.stack || err);
+    }
+
+    msg(title = "", subtitle = "", message = "", options = {}) {
+      if (!this.isMute) {
+        const formattedOptions = this.formatOptions(options);
+        switch (this.getEnv()) {
+          case "Surge":
+          case "Loon":
+          case "Shadowrocket":
+          case "Stash":
+            $notification.post(title, subtitle, message, formattedOptions);
+            break;
+          case "Quantumult X":
+            $notify(title, subtitle, message, formattedOptions);
+            break;
+          default:
+            console.log(`${title}\n${subtitle}\n${message}`);
+        }
+      }
+    }
+
+    formatOptions(options) {
+      if (typeof options === "string") return { "open-url": options };
+      if (typeof options === "object") return options;
+      return {};
+    }
+
+    done() {
+      const elapsedTime = (new Date().getTime() - this.startTime) / 1000;
+      this.log("", `🔔${this.name}, 结束! 🕛 ${elapsedTime} 秒`);
+      this.log();
+      if (this.getEnv() === "Node.js") process.exit();
+    }
+  })(name, options);
+}
