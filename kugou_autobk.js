@@ -1,5 +1,577 @@
-/*
-酷狗概念版每日自动领取VIP-Eric
-*/
-var _0xod8='jsjiami.cn.v7';const _0x1d4cc3=_0x3f19;function _0x3f19(_0x2a84b7,_0x5cada4){const _0x2737ea=_0x9e5f();return _0x3f19=function(_0x5a57be,_0x6fe1f1){_0x5a57be=_0x5a57be-0x1c7;let _0x9e5f6b=_0x2737ea[_0x5a57be];if(_0x3f19['afmhTD']===undefined){var _0x3f19f3=function(_0x58bc29){const _0xdd9a9a='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';let _0x31ec2c='',_0x2da7ee='',_0x37312d=_0x31ec2c+_0x3f19f3;for(let _0x497dbf=0x0,_0x27765e,_0x2092cc,_0x4c621f=0x0;_0x2092cc=_0x58bc29['charAt'](_0x4c621f++);~_0x2092cc&&(_0x27765e=_0x497dbf%0x4?_0x27765e*0x40+_0x2092cc:_0x2092cc,_0x497dbf++%0x4)?_0x31ec2c+=_0x37312d['charCodeAt'](_0x4c621f+0xa)-0xa!==0x0?String['fromCharCode'](0xff&_0x27765e>>(-0x2*_0x497dbf&0x6)):_0x497dbf:0x0){_0x2092cc=_0xdd9a9a['indexOf'](_0x2092cc);}for(let _0x25f439=0x0,_0x1c93f3=_0x31ec2c['length'];_0x25f439<_0x1c93f3;_0x25f439++){_0x2da7ee+='%'+('00'+_0x31ec2c['charCodeAt'](_0x25f439)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(_0x2da7ee);};const _0x556658=function(_0x4d2022,_0x5d2c6f){let _0x392757=[],_0x3f6182=0x0,_0x42a227,_0x5b2ffe='';_0x4d2022=_0x3f19f3(_0x4d2022);let _0x4badcd;for(_0x4badcd=0x0;_0x4badcd<0x100;_0x4badcd++){_0x392757[_0x4badcd]=_0x4badcd;}for(_0x4badcd=0x0;_0x4badcd<0x100;_0x4badcd++){_0x3f6182=(_0x3f6182+_0x392757[_0x4badcd]+_0x5d2c6f['charCodeAt'](_0x4badcd%_0x5d2c6f['length']))%0x100,_0x42a227=_0x392757[_0x4badcd],_0x392757[_0x4badcd]=_0x392757[_0x3f6182],_0x392757[_0x3f6182]=_0x42a227;}_0x4badcd=0x0,_0x3f6182=0x0;for(let _0x414bb7=0x0;_0x414bb7<_0x4d2022['length'];_0x414bb7++){_0x4badcd=(_0x4badcd+0x1)%0x100,_0x3f6182=(_0x3f6182+_0x392757[_0x4badcd])%0x100,_0x42a227=_0x392757[_0x4badcd],_0x392757[_0x4badcd]=_0x392757[_0x3f6182],_0x392757[_0x3f6182]=_0x42a227,_0x5b2ffe+=String['fromCharCode'](_0x4d2022['charCodeAt'](_0x414bb7)^_0x392757[(_0x392757[_0x4badcd]+_0x392757[_0x3f6182])%0x100]);}return _0x5b2ffe;};_0x3f19['DcJhCb']=_0x556658,_0x2a84b7=arguments,_0x3f19['afmhTD']=!![];}const _0x41e5d6=_0x2737ea[0x0],_0x59ece2=_0x5a57be+_0x41e5d6,_0x5ec998=_0x2a84b7[_0x59ece2];if(!_0x5ec998){if(_0x3f19['zQugkD']===undefined){const _0x491ce3=function(_0x2a0d7e){this['SzzKRA']=_0x2a0d7e,this['nHZrzL']=[0x1,0x0,0x0],this['pdZluG']=function(){return'newState';},this['spsqcz']='\x5cw+\x20*\x5c(\x5c)\x20*{\x5cw+\x20*',this['GyJVco']='[\x27|\x22].+[\x27|\x22];?\x20*}';};_0x491ce3['prototype']['HBeEvN']=function(){const _0x5a62cc=new RegExp(this['spsqcz']+this['GyJVco']),_0x59c091=_0x5a62cc['test'](this['pdZluG']['toString']())?--this['nHZrzL'][0x1]:--this['nHZrzL'][0x0];return this['OaJmMg'](_0x59c091);},_0x491ce3['prototype']['OaJmMg']=function(_0x446063){if(!Boolean(~_0x446063))return _0x446063;return this['dzNkTm'](this['SzzKRA']);},_0x491ce3['prototype']['dzNkTm']=function(_0x5b8067){for(let _0x1b572f=0x0,_0x35d8f1=this['nHZrzL']['length'];_0x1b572f<_0x35d8f1;_0x1b572f++){this['nHZrzL']['push'](Math['round'](Math['random']())),_0x35d8f1=this['nHZrzL']['length'];}return _0x5b8067(this['nHZrzL'][0x0]);},new _0x491ce3(_0x3f19)['HBeEvN'](),_0x3f19['zQugkD']=!![];}_0x9e5f6b=_0x3f19['DcJhCb'](_0x9e5f6b,_0x6fe1f1),_0x2a84b7[_0x59ece2]=_0x9e5f6b;}else _0x9e5f6b=_0x5ec998;return _0x9e5f6b;},_0x3f19(_0x2a84b7,_0x5cada4);}(function(_0x376a64,_0x585868,_0x3e663e,_0x2714e0,_0x488f72,_0x121901,_0x462291){return _0x376a64=_0x376a64>>0x8,_0x121901='hs',_0x462291='hs',function(_0x2ff8d7,_0x4a387c,_0xf242a4,_0x556d3f,_0x4cac06){const _0x1baabb=_0x3f19;_0x556d3f='tfi',_0x121901=_0x556d3f+_0x121901,_0x4cac06='up',_0x462291+=_0x4cac06,_0x121901=_0xf242a4(_0x121901),_0x462291=_0xf242a4(_0x462291),_0xf242a4=0x0;const _0x1622ca=_0x2ff8d7();while(!![]&&--_0x2714e0+_0x4a387c){try{_0x556d3f=-parseInt(_0x1baabb(0x262,'sWP!'))/0x1+parseInt(_0x1baabb(0x1e6,'Y6Wb'))/0x2+-parseInt(_0x1baabb(0x250,'Z0Gr'))/0x3+parseInt(_0x1baabb(0x263,'P0GR'))/0x4*(-parseInt(_0x1baabb(0x226,'PeCv'))/0x5)+parseInt(_0x1baabb(0x24f,'dPDt'))/0x6+-parseInt(_0x1baabb(0x25b,'Y6oO'))/0x7+parseInt(_0x1baabb(0x21f,'cVM0'))/0x8;}catch(_0x1b254d){_0x556d3f=_0xf242a4;}finally{_0x4cac06=_0x1622ca[_0x121901]();if(_0x376a64<=_0x2714e0)_0xf242a4?_0x488f72?_0x556d3f=_0x4cac06:_0x488f72=_0x4cac06:_0xf242a4=_0x4cac06;else{if(_0xf242a4==_0x488f72['replace'](/[yVCTULkoxWuNIJfHbpr=]/g,'')){if(_0x556d3f===_0x4a387c){_0x1622ca['un'+_0x121901](_0x4cac06);break;}_0x1622ca[_0x462291](_0x4cac06);}}}}}(_0x3e663e,_0x585868,function(_0x2b103b,_0x530fbe,_0x1b5017,_0x561224,_0x27715c,_0x5d8f83,_0x4f4ae2){return _0x530fbe='\x73\x70\x6c\x69\x74',_0x2b103b=arguments[0x0],_0x2b103b=_0x2b103b[_0x530fbe](''),_0x1b5017=`\x72\x65\x76\x65\x72\x73\x65`,_0x2b103b=_0x2b103b[_0x1b5017]('\x76'),_0x561224=`\x6a\x6f\x69\x6e`,(0x17ec84,_0x2b103b[_0x561224](''));});}(0xbe00,0x4b22e,_0x9e5f,0xc0),_0x9e5f)&&(_0xod8=0x6b3);const _0x3504a0=new Env(_0x1d4cc3(0x207,'8FDT'));function _0x4084c1(_0x181d6a){const _0x57b6ec=_0x1d4cc3,_0x2606f6={'oIJXb':function(_0x595774,_0x733e8c){return _0x595774!==_0x733e8c;},'SXZhf':_0x57b6ec(0x225,'bh8#'),'WbxMj':_0x57b6ec(0x20a,'Y6Wb'),'WrHkN':function(_0x18478c,_0x6b1fc){return _0x18478c===_0x6b1fc;},'JeXsm':_0x57b6ec(0x1c8,'^44O'),'nxnAx':_0x57b6ec(0x1d2,'MYgI'),'hWNfJ':function(_0x21c752,_0x23cf1a){return _0x21c752!==_0x23cf1a;},'GiIbW':_0x57b6ec(0x258,'L&kh'),'zUPMa':_0x57b6ec(0x1de,'e&PP'),'aCyuL':_0x57b6ec(0x1dd,'KTtJ'),'BCUsD':_0x57b6ec(0x21c,'#KAF'),'HXkcx':function(_0x4affac,_0x35027f,_0x11cd54){return _0x4affac(_0x35027f,_0x11cd54);},'GaBER':function(_0x43b02c){return _0x43b02c();}},_0x2685ea=(function(){const _0x1692f4=_0x57b6ec,_0x5bf44a={'clNJF':function(_0x3aa836,_0x3d0729){const _0x288b95=_0x3f19;return _0x2606f6[_0x288b95(0x1da,'qW2U')](_0x3aa836,_0x3d0729);},'WBslE':_0x2606f6[_0x1692f4(0x20b,'0)sB')],'xndMy':function(_0x18dd4e,_0xb09c7f){const _0x58955b=_0x1692f4;return _0x2606f6[_0x58955b(0x256,'QN]8')](_0x18dd4e,_0xb09c7f);},'pBxUo':_0x2606f6[_0x1692f4(0x22e,'76Ka')],'mtWtW':function(_0x406318,_0x75ec21){const _0x2e82f8=_0x1692f4;return _0x2606f6[_0x2e82f8(0x1f5,'$*qi')](_0x406318,_0x75ec21);},'zqbLz':_0x2606f6[_0x1692f4(0x23b,'sWP!')],'Rneuw':_0x2606f6[_0x1692f4(0x1e1,'qW2U')]};if(_0x2606f6[_0x1692f4(0x253,'#Dk)')](_0x2606f6[_0x1692f4(0x1fb,'cVM0')],_0x2606f6[_0x1692f4(0x1d0,'sM#&')])){let _0x48630f=!![];return function(_0xf669ce,_0x4d7ffb){const _0x438bfe=_0x1692f4,_0xe293ca={'uJsLS':function(_0xb20063,_0x32daa4){const _0x5e6ea3=_0x3f19;return _0x5bf44a[_0x5e6ea3(0x20d,'#KAF')](_0xb20063,_0x32daa4);},'AuicO':_0x5bf44a[_0x438bfe(0x22d,'qW2U')],'yOCRr':function(_0x12aeef,_0x3a6aef){const _0x5158ae=_0x438bfe;return _0x5bf44a[_0x5158ae(0x1d5,'sWP!')](_0x12aeef,_0x3a6aef);},'DrLrn':_0x5bf44a[_0x438bfe(0x1d1,'[e5Q')]};if(_0x5bf44a[_0x438bfe(0x1ff,'Y6oO')](_0x5bf44a[_0x438bfe(0x1f3,'Y6oO')],_0x5bf44a[_0x438bfe(0x24c,'L&kh')])){if(_0x113903){const _0x584f38=_0x4113b4[_0x438bfe(0x1cb,'P0GR')](_0x1fe2db,arguments);return _0x250b15=null,_0x584f38;}}else{const _0x2098e3=_0x48630f?function(){const _0x1fa943=_0x438bfe;if(_0xe293ca[_0x1fa943(0x22c,'%Ds(')](_0xe293ca[_0x1fa943(0x1cf,'8FDT')],_0xe293ca[_0x1fa943(0x1e2,'sWP!')]))_0x432e9d[_0x1fa943(0x1cd,'dPDt')]();else{if(_0x4d7ffb){if(_0xe293ca[_0x1fa943(0x25e,'^44O')](_0xe293ca[_0x1fa943(0x23e,'bh8#')],_0xe293ca[_0x1fa943(0x1f1,'*lH2')]))return _0x308061[_0x1fa943(0x264,'$P4!')](_0x13d252[_0x1fa943(0x1f8,'MYgI')](_0x4595a0))||{};else{const _0x32305c=_0x4d7ffb[_0x1fa943(0x206,'h%CL')](_0xf669ce,arguments);return _0x4d7ffb=null,_0x32305c;}}}}:function(){};return _0x48630f=![],_0x2098e3;}};}else{const _0x7b9a80=_0x4c621f?function(){const _0x4a2c4b=_0x1692f4;if(_0x3f6182){const _0x6da6d6=_0x414bb7[_0x4a2c4b(0x1e7,'L&kh')](_0x491ce3,arguments);return _0x2a0d7e=null,_0x6da6d6;}}:function(){};return _0x392757=![],_0x7b9a80;}}()),_0x4eac1d=_0x2606f6[_0x57b6ec(0x224,'qW2U')](_0x2685ea,this,function(){const _0x2ca0c4=_0x57b6ec;return _0x2606f6[_0x2ca0c4(0x265,'76Ka')](_0x2606f6[_0x2ca0c4(0x1e5,'(YDm')],_0x2606f6[_0x2ca0c4(0x25a,'4Qym')])?_0x17a737[_0x2ca0c4(0x249,'Y6oO')](_0x540114[_0x2ca0c4(0x26b,'FP$^')](_0x3be4db))||{}:_0x4eac1d[_0x2ca0c4(0x1d7,'Y6oO')]()[_0x2ca0c4(0x1d6,'PeCv')](_0x2606f6[_0x2ca0c4(0x247,'8FDT')])[_0x2ca0c4(0x1f7,'sM#&')]()[_0x2ca0c4(0x1cc,'*lH2')](_0x4eac1d)[_0x2ca0c4(0x259,'76Ka')](_0x2606f6[_0x2ca0c4(0x21a,'2&EZ')]);});_0x2606f6[_0x57b6ec(0x1f9,'Qu23')](_0x4eac1d);if($persistentStore)return JSON[_0x57b6ec(0x1dc,'PeCv')]($persistentStore[_0x57b6ec(0x229,'%Ds(')](_0x181d6a))||{};else{if($prefs)return JSON[_0x57b6ec(0x244,'Prw*')]($prefs[_0x57b6ec(0x23d,'Y6oO')](_0x181d6a))||{};else{if($persistent)return JSON[_0x57b6ec(0x237,'MYgI')]($persistent[_0x57b6ec(0x245,'El7H')](_0x181d6a))||{};}}return{};}let _0x3510ba=_0x4084c1(_0x1d4cc3(0x24d,'X#YG')),_0x5d5dd7=_0x4084c1(_0x1d4cc3(0x23c,'uJcj')),_0x54358a=_0x4084c1(_0x1d4cc3(0x208,'%Ds(')),_0x103d6=_0x1d4cc3(0x1d9,'#Dhv')+_0x3510ba[_0x1d4cc3(0x25f,'h%CL')]+_0x1d4cc3(0x1fe,'MYgI')+_0x3510ba[_0x1d4cc3(0x1f4,'sWP!')]+_0x1d4cc3(0x218,'KTtJ')+_0x3510ba[_0x1d4cc3(0x21e,'Z0Gr')]+_0x1d4cc3(0x21b,'uJcj')+_0x3510ba[_0x1d4cc3(0x251,'@dk&')]+_0x1d4cc3(0x210,'X#YG')+_0x3510ba[_0x1d4cc3(0x26c,'Srgy')]+_0x1d4cc3(0x1f2,'bh8#')+_0x3510ba[_0x1d4cc3(0x248,'0)sB')]+_0x1d4cc3(0x1ca,'$*qi')+_0x3510ba[_0x1d4cc3(0x1df,'L&kh')]+_0x1d4cc3(0x233,'uk[S')+_0x3510ba[_0x1d4cc3(0x1f0,'4Qym')]+_0x1d4cc3(0x228,'X#YG')+_0x3510ba[_0x1d4cc3(0x1ce,'4Qym')]+_0x1d4cc3(0x223,'h%CL')+_0x3510ba[_0x1d4cc3(0x232,'L&kh')],_0x18dd37={':authority':_0x5d5dd7[_0x1d4cc3(0x20e,'(YDm')],'content-type':_0x5d5dd7[_0x1d4cc3(0x235,'%Ds(')],'kg-rf':_0x5d5dd7[_0x1d4cc3(0x268,'PeCv')],'accept':_0x5d5dd7[_0x1d4cc3(0x227,'Y6Wb')],'kg-thash':_0x5d5dd7[_0x1d4cc3(0x204,'#(aM')],'accept-language':_0x5d5dd7[_0x1d4cc3(0x1db,'P0GR')],'accept-encoding':_0x5d5dd7[_0x1d4cc3(0x25c,'$*qi')],'kg-rec':_0x5d5dd7[_0x1d4cc3(0x269,'(YDm')],'user-agent':_0x5d5dd7[_0x1d4cc3(0x1ea,'$P4!')],'kg-rc':_0x5d5dd7[_0x1d4cc3(0x24e,'K*&&')],'kg-fake':_0x5d5dd7[_0x1d4cc3(0x257,'cVM0')],'content-length':_0x5d5dd7[_0x1d4cc3(0x1c7,'uk[S')],'uni-useragent':_0x5d5dd7[_0x1d4cc3(0x254,'#Dk)')]};const _0x45d782={'url':_0x103d6,'headers':_0x18dd37};_0x3504a0[_0x1d4cc3(0x220,'HrWL')](_0x45d782,function(_0x5158d5,_0x2cfc3e,_0x2fe968){const _0x40035e=_0x1d4cc3,_0x519a45={'rIcSz':_0x40035e(0x212,'L&kh'),'LNtaq':function(_0x513ef9,_0x5c1508){return _0x513ef9===_0x5c1508;},'gxWIC':_0x40035e(0x1d4,'e&PP'),'AdLSM':_0x40035e(0x25d,'FP$^'),'yTSdb':_0x40035e(0x1ed,'%Ds('),'XHuPG':_0x40035e(0x214,'T(pr'),'SsDIF':_0x40035e(0x22f,'2&EZ'),'zyrMS':_0x40035e(0x1ee,'4Qym'),'fNkvq':function(_0x3e9bed,_0x335f4e){return _0x3e9bed===_0x335f4e;},'OVXOc':function(_0x3c2443,_0x5dfdc3){return _0x3c2443!==_0x5dfdc3;},'nhNWs':_0x40035e(0x203,'8FDT'),'IZXnr':_0x40035e(0x20f,'X#YG'),'tWulw':_0x40035e(0x22b,'%Ds('),'LOmob':_0x40035e(0x1fc,'h%CL')};if(_0x5158d5){_0x3504a0[_0x40035e(0x213,'Y6Wb')](_0x519a45[_0x40035e(0x216,'%Ds(')],_0x5158d5),_0x3504a0[_0x40035e(0x211,'cVM0')]();return;}try{_0x3504a0[_0x40035e(0x236,'@dk&')](_0x2fe968);const _0x4dc985=JSON[_0x40035e(0x240,'^44O')](_0x2fe968);if(_0x519a45[_0x40035e(0x1ef,'K*&&')](_0x4dc985[_0x40035e(0x202,'X#YG')],0x1)){if(_0x519a45[_0x40035e(0x246,'*lH2')](_0x519a45[_0x40035e(0x23f,'Z0Gr')],_0x519a45[_0x40035e(0x1e9,'2&EZ')]))_0x3504a0[_0x40035e(0x222,'MYgI')](_0x519a45[_0x40035e(0x1d8,'MYgI')],_0x519a45[_0x40035e(0x1e0,'PeCv')],'');else{_0x2b1feb[_0x40035e(0x26d,'#Dhv')](_0x519a45[_0x40035e(0x243,'Y6oO')],_0x28dce5),_0x2a3bed[_0x40035e(0x242,'(YDm')]();return;}}else{if(_0x519a45[_0x40035e(0x1f6,'PeCv')](_0x519a45[_0x40035e(0x21d,'MYgI')],_0x519a45[_0x40035e(0x1e8,'2&EZ')]))_0x3504a0[_0x40035e(0x234,'QN]8')](_0x519a45[_0x40035e(0x1c9,'dPDt')],_0x40035e(0x23a,'T(pr')+_0x4dc985[_0x40035e(0x261,'8FDT')],'');else{_0x38c460[_0x40035e(0x1fa,'FP$^')](_0x346fce);const _0x16016e=_0x2d9af3[_0x40035e(0x1e3,'L&kh')](_0x4b2e95);_0x519a45[_0x40035e(0x239,'bh8#')](_0x16016e[_0x40035e(0x267,'@dk&')],0x1)?_0x251605[_0x40035e(0x238,'0^wn')](_0x519a45[_0x40035e(0x201,'#(aM')],_0x519a45[_0x40035e(0x24a,'uJcj')],''):_0x3acff[_0x40035e(0x215,'KTtJ')](_0x519a45[_0x40035e(0x1fd,'qW2U')],_0x40035e(0x230,'e&PP')+_0x16016e[_0x40035e(0x20c,'0^wn')],'');}}}catch(_0x20edb9){_0x519a45[_0x40035e(0x241,'2kkM')](_0x519a45[_0x40035e(0x26a,'$P4!')],_0x519a45[_0x40035e(0x252,'L&kh')])?(_0x3504a0[_0x40035e(0x22a,'QN]8')](_0x519a45[_0x40035e(0x209,'[e5Q')],_0x20edb9),_0x3504a0[_0x40035e(0x215,'KTtJ')](_0x519a45[_0x40035e(0x24b,'PeCv')],_0x519a45[_0x40035e(0x1d3,'bh8#')],'')):(_0x5a78cc[_0x40035e(0x1eb,'K*&&')](_0x519a45[_0x40035e(0x255,'cVM0')],_0x14672c),_0x437886[_0x40035e(0x200,'Prw*')](_0x519a45[_0x40035e(0x1e4,'Y6Wb')],_0x519a45[_0x40035e(0x1ec,'sM#&')],''));}finally{_0x3504a0[_0x40035e(0x1cd,'dPDt')]();}});function _0x9e5f(){const _0x1646ab=(function(){return[...[_0xod8,'JfujyNsNjbiWVaJmILiuy.HcpnxV.rIvC7okTIU==','eJVdKa','W6z6pfvX','5B2w5AwA5BE06Ao+5y2i5Pws6z6B5ysD6AgcW4i','WQyNW4LTW7q','s8oKhCkDW67dUmkCWRZdM8kpW6H1','W5DsW5LHF8kiBSoYW4ZdM8om','W65gbezU','cCo6DhBcTq','psz2WP82','qIVcU3ur','WRJdRCkYW5u','W5n6W5zhya','lWSdvCkm','W6/cQSozW67dU8kFWRG','AXNdRCkIta','y8krW6niW5u','W6BcPmomoq','W5fsW4DNFW','ySoLmmkQW4y','WPPWWOXuW4i','nW5FWRjx','bKPrihNcT8kuWOFdQa','W4ZdH0hdNJu','WRjuW7LZWOBdQ3BdLNBdHbr4W7C','umkIdXxdSmkaxdhdUmowmSkp','qs3cIW','ks9xWQHc','qWldHmkdW6q','xJVdO8oiW5VdL8o9dapcVCk4oxy','W65uWPr7qa','d8k2W6BdRfa','W517W4XnzJtdSG','pZvrWOrh','fKddOSoFWRDM','WQCaW4VdLSk3','WPacWOiNkmo8oCoAW47dLmoLWP1K','BmkojJldHSodWR5UWQhcOCkSW6a6wM0','W7RcLtBcJ+s5GEAdOEAiJUwiLUMJQUwmVHJcJCkG','naHhWR4H','pmkCW705DG','eXifyfalu8osW7xcVmosbX8','rmkGW4ruW6pcPSoMW7Sc','W557WQmQWQ1VvbHFsfi','W73dKZhdPKfeWQCMA8ozW4nA','W7ZcKmoFWPCN','cMZdICo1WRy','gJBcKIBcPCoQrhzKfSkCFa','xZdcJJxdJ1a','WQjKW6vVW6i','WRFdPCoXW4jxW6y','W4dcVSoaWOSG','W43cGJ7cIa','W5fjW6uX','uNlcQq','yCkNWPzfB8opeCk/W6ddGCktimkVsG','pILTWRWy','W7O3WPWVW5y','k8kzkJZdK8ozWQ4','WQVcLNpcVW0','rYddM8kEw8oNW4GdmmkOqa','W6CmWQeU','WRuXW5hdGSklWRZdOCol','ymkNW59yW54','W5lcVSohWPZdMG','eXi3jcG','rSk8W4FcVCoh','W5bnoNLt','6i2B5y2u5OQQ5yIW','WPqSW7vtW6a','WRPMWQLVW6FdSq','W5vCW6zGAmkNB8oN','rSkTW4hcGmoM','vMNcUSo7pdWCCSkEW6RdQfVcTgNdHueVySkzWRGyW5lcG8k6mmkofGJcSI7dRmotW5hdPHvlz0n9DmoEWQbdp8kvWRlcKSo5WOlcRmkrW6hcPJ50jIOMW6aZiCkKW6LTW7BdPCoMW6a1WOFdQmoGWQuB','bLdcOCoLyG','WQVcHwdcTGqcW7mTxCotW7jdBMzx','WRLIWRPUW6e','W4ldHwWrWPW','WRRdLSoGW53dPq','eq9rWQjo','WOHNWOroW4K','b2hcHCo8Ea','WQ03W7H9W5y','fqfiWRrf'],...(function(){return['bbBdPMPr','WR3dGCkLW4v+','yfZcMXqGvmo0W7nnW5BdP20','bbbkWQTz','WRldRSkghZe','WO/dO8kRhtq','W7NcGSoiWPzVWOtdQmo4W43cKW','W4VdJWS','W5lcKSoLWPZdQa','6iYf5y6h5AsW6lAb','5PsM5Rkw6kwr5PYZ5P+25yMT5zUG6l275zMq55QQ5PsN5O2e','W4hdRGFdMIC','WRmWW5FdKCksWQG','yd3dUCkFqq','WOXqlL1Kta','W5TcW5Dyya','WO8UW7H7W7DsDqL+','wSkFdtZdUa','WOvnWRX8W7u','W5ZcHmoeWQxdICkoWPtcKG','rSkWW6lcGmoroaW','WRNdUCoZWO1B','W5pcIdG','W7f1WQHjua','f8kPW54vFW','ee3cUmozyG','b8k2W7RcOmoamXxdUr8Fga','W4XhW6jGtq','mHKw','WO4qcCkvcG','aeXCbg3cTG','sSk2W4rXW7q','WOipC8kOixXqW48','e1ddOJzvWRDDFXOBW7a6','pmkCW708AW','6yww54If5Qs05B+o54Uz6ist5yIJ6Aco5y6ZW5WWn8oMxmkdW6pcGW','W50JAmodAf1/WPS+W4ldVW','oXG6iqa','iXBdH0TT','W5hcMSo/nqK','gJRdHu9xlSoxWQVdIq','quL9eIq','W6BdO8kPW4rAW6OCyWRdTq','kLDAmK0','vu1igxZdUa','W5jZWO9o','6k6s5RcI5yEa6zEEgG','oWRdHq','6kEM5P+J5zol5BUS5PEU5O+C5ywH6zAjW74','W5/dH1i','W4ayySo3EW','WRNdVSkAWPtcVCoiW60JW7JdImoUb8k4','WPtdL1K6WPHpWPNcQSkrtCohW64','p8ouD2pcGSo+W4r/WPZcICkT','WOtdUSkMaai','bCoSfCkDWRy','cG0BDKKusmkvWR3dGSkCrq','vCkcW6pcPCos','bmo+u0tcQmogzaJdUCo2','WOuVW5yAmM3cR8kaW47cHvlcSIa','WP14W5pdUG','nKaXsCkRWOdcO8o9WOJcRCo8WR51','tmkMW7e','E8kFW6q3FbexW4dcPwy0','iuhcGmoEEa','W4X/df5b','W7GZWQzSW6pdGmoWAq','nGBdGuzNea','vuTpe3NcTCkfWOpdV1O','W4a0ymoa','dmkqW4S','W5Stqmo1ya','W4CBCSoOuG','pLVcMmorrq','mKFdU8oGWR4','6ksL5PYP5AEc6lww','5B6/5AAR5Bwi6AcP5y2x5PAG6z605yAl6AkVWRG','emoIW5HkW7BcOmoKW4m','fGLDWQLbWORdHaf0','jmk9WOTuEmoiaCkV','dCkmW4S','W5e+B8oqzf1QW5OFW4NdO8oe','qcVcIa','uCk0W6tcUSoa'];}())];}());_0x9e5f=function(){return _0x1646ab;};return _0x9e5f();};
-function Env(t,e){class s{constructor(t){this.env=t}send(t,e="GET"){t="string"==typeof t?{url:t}:t;let s=this.get;return"POST"===e&&(s=this.post),new Promise((e,a)=>{s.call(this,t,(t,s,r)=>{t?a(t):e(s)})})}get(t){return this.send.call(this.env,t)}post(t){return this.send.call(this.env,t,"POST")}}return new class{constructor(t,e){this.name=t,this.http=new s(this),this.data=null,this.dataFile="box.dat",this.logs=[],this.isMute=!1,this.isNeedRewrite=!1,this.logSeparator="\n",this.encoding="utf-8",this.startTime=(new Date).getTime(),Object.assign(this,e),this.log("",`🔔${this.name}, 开始!`)}getEnv(){return"undefined"!=typeof $environment&&$environment["surge-version"]?"Surge":"undefined"!=typeof $environment&&$environment["stash-version"]?"Stash":"undefined"!=typeof module&&module.exports?"Node.js":"undefined"!=typeof $task?"Quantumult X":"undefined"!=typeof $loon?"Loon":"undefined"!=typeof $rocket?"Shadowrocket":void 0}isNode(){return"Node.js"===this.getEnv()}isQuanX(){return"Quantumult X"===this.getEnv()}isSurge(){return"Surge"===this.getEnv()}isLoon(){return"Loon"===this.getEnv()}isShadowrocket(){return"Shadowrocket"===this.getEnv()}isStash(){return"Stash"===this.getEnv()}toObj(t,e=null){try{return JSON.parse(t)}catch{return e}}toStr(t,e=null){try{return JSON.stringify(t)}catch{return e}}getjson(t,e){let s=e;const a=this.getdata(t);if(a)try{s=JSON.parse(this.getdata(t))}catch{}return s}setjson(t,e){try{return this.setdata(JSON.stringify(t),e)}catch{return!1}}getScript(t){return new Promise(e=>{this.get({url:t},(t,s,a)=>e(a))})}runScript(t,e){return new Promise(s=>{let a=this.getdata("@chavy_boxjs_userCfgs.httpapi");a=a?a.replace(/\n/g,"").trim():a;let r=this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");r=r?1*r:20,r=e&&e.timeout?e.timeout:r;const[i,o]=a.split("@"),n={url:`http://${o}/v1/scripting/evaluate`,body:{script_text:t,mock_type:"cron",timeout:r},headers:{"X-Key":i,Accept:"*/*"},timeout:r};this.post(n,(t,e,a)=>s(a))}).catch(t=>this.logErr(t))}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),a=!s&&this.fs.existsSync(e);if(!s&&!a)return{};{const a=s?t:e;try{return JSON.parse(this.fs.readFileSync(a))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),a=!s&&this.fs.existsSync(e),r=JSON.stringify(this.data);s?this.fs.writeFileSync(t,r):a?this.fs.writeFileSync(e,r):this.fs.writeFileSync(t,r)}}lodash_get(t,e,s){const a=e.replace(/\[(\d+)\]/g,".$1").split(".");let r=t;for(const t of a)if(r=Object(r)[t],void 0===r)return s;return r}lodash_set(t,e,s){return Object(t)!==t?t:(Array.isArray(e)||(e=e.toString().match(/[^.[\]]+/g)||[]),e.slice(0,-1).reduce((t,s,a)=>Object(t[s])===t[s]?t[s]:t[s]=Math.abs(e[a+1])>>0==+e[a+1]?[]:{},t)[e[e.length-1]]=s,t)}getdata(t){let e=this.getval(t);if(/^@/.test(t)){const[,s,a]=/^@(.*?)\.(.*?)$/.exec(t),r=s?this.getval(s):"";if(r)try{const t=JSON.parse(r);e=t?this.lodash_get(t,a,""):e}catch(t){e=""}}return e}setdata(t,e){let s=!1;if(/^@/.test(e)){const[,a,r]=/^@(.*?)\.(.*?)$/.exec(e),i=this.getval(a),o=a?"null"===i?null:i||"{}":"{}";try{const e=JSON.parse(o);this.lodash_set(e,r,t),s=this.setval(JSON.stringify(e),a)}catch(e){const i={};this.lodash_set(i,r,t),s=this.setval(JSON.stringify(i),a)}}else s=this.setval(t,e);return s}getval(t){switch(this.getEnv()){case"Surge":case"Loon":case"Stash":case"Shadowrocket":return $persistentStore.read(t);case"Quantumult X":return $prefs.valueForKey(t);case"Node.js":return this.data=this.loaddata(),this.data[t];default:return this.data&&this.data[t]||null}}setval(t,e){switch(this.getEnv()){case"Surge":case"Loon":case"Stash":case"Shadowrocket":return $persistentStore.write(t,e);case"Quantumult X":return $prefs.setValueForKey(t,e);case"Node.js":return this.data=this.loaddata(),this.data[e]=t,this.writedata(),!0;default:return this.data&&this.data[e]||null}}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,e=(()=>{})){switch(t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"],delete t.headers["content-type"],delete t.headers["content-length"]),t.params&&(t.url+="?"+this.queryStr(t.params)),this.getEnv()){case"Surge":case"Loon":case"Stash":case"Shadowrocket":default:this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient.get(t,(t,s,a)=>{!t&&s&&(s.body=a,s.statusCode=s.status?s.status:s.statusCode,s.status=s.statusCode),e(t,s,a)});break;case"Quantumult X":this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:a,headers:r,body:i,bodyBytes:o}=t;e(null,{status:s,statusCode:a,headers:r,body:i,bodyBytes:o},i,o)},t=>e(t&&t.error||"UndefinedError"));break;case"Node.js":let s=require("iconv-lite");this.initGotEnv(t),this.got(t).on("redirect",(t,e)=>{try{if(t.headers["set-cookie"]){const s=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();s&&this.ckjar.setCookieSync(s,null),e.cookieJar=this.ckjar}}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:a,statusCode:r,headers:i,rawBody:o}=t,n=s.decode(o,this.encoding);e(null,{status:a,statusCode:r,headers:i,rawBody:o,body:n},n)},t=>{const{message:a,response:r}=t;e(a,r,r&&s.decode(r.rawBody,this.encoding))})}}post(t,e=(()=>{})){const s=t.method?t.method.toLocaleLowerCase():"post";switch(t.body&&t.headers&&!t.headers["Content-Type"]&&!t.headers["content-type"]&&(t.headers["content-type"]="application/x-www-form-urlencoded"),t.headers&&(delete t.headers["Content-Length"],delete t.headers["content-length"]),this.getEnv()){case"Surge":case"Loon":case"Stash":case"Shadowrocket":default:this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient[s](t,(t,s,a)=>{!t&&s&&(s.body=a,s.statusCode=s.status?s.status:s.statusCode,s.status=s.statusCode),e(t,s,a)});break;case"Quantumult X":t.method=s,this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:a,headers:r,body:i,bodyBytes:o}=t;e(null,{status:s,statusCode:a,headers:r,body:i,bodyBytes:o},i,o)},t=>e(t&&t.error||"UndefinedError"));break;case"Node.js":let a=require("iconv-lite");this.initGotEnv(t);const{url:r,...i}=t;this.got[s](r,i).then(t=>{const{statusCode:s,statusCode:r,headers:i,rawBody:o}=t,n=a.decode(o,this.encoding);e(null,{status:s,statusCode:r,headers:i,rawBody:o,body:n},n)},t=>{const{message:s,response:r}=t;e(s,r,r&&a.decode(r.rawBody,this.encoding))})}}time(t,e=null){const s=e?new Date(e):new Date;let a={"M+":s.getMonth()+1,"d+":s.getDate(),"H+":s.getHours(),"m+":s.getMinutes(),"s+":s.getSeconds(),"q+":Math.floor((s.getMonth()+3)/3),S:s.getMilliseconds()};/(y+)/.test(t)&&(t=t.replace(RegExp.$1,(s.getFullYear()+"").substr(4-RegExp.$1.length)));for(let e in a)new RegExp("("+e+")").test(t)&&(t=t.replace(RegExp.$1,1==RegExp.$1.length?a[e]:("00"+a[e]).substr((""+a[e]).length)));return t}queryStr(t){let e="";for(const s in t){let a=t[s];null!=a&&""!==a&&("object"==typeof a&&(a=JSON.stringify(a)),e+=`${s}=${a}&`)}return e=e.substring(0,e.length-1),e}msg(e=t,s="",a="",r){const i=t=>{switch(typeof t){case void 0:return t;case"string":switch(this.getEnv()){case"Surge":case"Stash":default:return{url:t};case"Loon":case"Shadowrocket":return t;case"Quantumult X":return{"open-url":t};case"Node.js":return}case"object":switch(this.getEnv()){case"Surge":case"Stash":case"Shadowrocket":default:{let e=t.url||t.openUrl||t["open-url"];return{url:e}}case"Loon":{let e=t.openUrl||t.url||t["open-url"],s=t.mediaUrl||t["media-url"];return{openUrl:e,mediaUrl:s}}case"Quantumult X":{let e=t["open-url"]||t.url||t.openUrl,s=t["media-url"]||t.mediaUrl,a=t["update-pasteboard"]||t.updatePasteboard;return{"open-url":e,"media-url":s,"update-pasteboard":a}}case"Node.js":return}default:return}};if(!this.isMute)switch(this.getEnv()){case"Surge":case"Loon":case"Stash":case"Shadowrocket":default:$notification.post(e,s,a,i(r));break;case"Quantumult X":$notify(e,s,a,i(r));break;case"Node.js":}if(!this.isMuteLog){let t=["","==============📣系统通知📣=============="];t.push(e),s&&t.push(s),a&&t.push(a),console.log(t.join("\n")),this.logs=this.logs.concat(t)}}log(...t){t.length>0&&(this.logs=[...this.logs,...t]),console.log(t.join(this.logSeparator))}logErr(t,e){switch(this.getEnv()){case"Surge":case"Loon":case"Stash":case"Shadowrocket":case"Quantumult X":default:this.log("",`❗️${this.name}, 错误!`,t);break;case"Node.js":this.log("",`❗️${this.name}, 错误!`,t.stack)}}wait(t){return new Promise(e=>setTimeout(e,t))}done(t={}){const e=(new Date).getTime(),s=(e-this.startTime)/1e3;switch(this.log("",`🔔${this.name}, 结束! 🕛 ${s} 秒`),this.log(),this.getEnv()){case"Surge":case"Loon":case"Stash":case"Shadowrocket":case"Quantumult X":default:$done(t);break;case"Node.js":process.exit(1)}}}(t,e)}
+//Thu Jan 09 2025 04:16:12 GMT+0000 (Coordinated Universal Time)
+//Base:https://github.com/echo094/decode-js
+//Modify:https://github.com/smallfawn/decode_action
+const ill11iii = new Env("酷狗概念版自动领取VIP-Eric");
+if ($request.url) {
+  let i1lIIii1 = $request.url,
+    i1lIllI1 = $request.headers,
+    Il11lI1 = new URLSearchParams(i1lIIii1.split("?")[1]),
+    IIIiiili = {
+      "appid": Il11lI1.get("appid"),
+      "clientver": Il11lI1.get("clientver"),
+      "clienttime": Il11lI1.get("clienttime"),
+      "mid": Il11lI1.get("mid"),
+      "uuid": Il11lI1.get("uuid"),
+      "dfid": Il11lI1.get("dfid"),
+      "token": Il11lI1.get("token"),
+      "userid": Il11lI1.get("userid"),
+      "srcappid": Il11lI1.get("srcappid"),
+      "signature": Il11lI1.get("signature")
+    },
+    IIlii = {
+      ":authority": i1lIllI1[":authority"],
+      "content-type": i1lIllI1["content-type"],
+      "kg-rf": i1lIllI1["kg-rf"],
+      "accept": i1lIllI1.accept,
+      "kg-thash": i1lIllI1["kg-thash"],
+      "accept-language": i1lIllI1["accept-language"],
+      "accept-encoding": i1lIllI1["accept-encoding"],
+      "kg-rec": i1lIllI1["kg-rec"],
+      "user-agent": i1lIllI1["user-agent"],
+      "kg-rc": i1lIllI1["kg-rc"],
+      "kg-fake": i1lIllI1["kg-fake"],
+      "content-length": i1lIllI1["content-length"],
+      "uni-useragent": i1lIllI1["uni-useragent"]
+    };
+  function IlI1Illi(iliIlii, IiiI1lI) {
+    if (typeof $prefs !== "undefined") return $prefs.setValueForKey(JSON.stringify(IiiI1lI), iliIlii);else {
+      if (typeof $persistentStore !== "undefined") return $persistentStore.write(JSON.stringify(IiiI1lI), iliIlii);else {
+        if (typeof $persistent !== "undefined") {
+          return $persistent.setItem(iliIlii, JSON.stringify(IiiI1lI));
+        }
+      }
+    }
+  }
+  IlI1Illi("urlParams", IIIiiili);
+  IlI1Illi("headerParams", IIlii);
+  IlI1Illi("originalUrl", i1lIIii1);
+  ill11iii.log("保存的 URL Params:", JSON.stringify(IIIiiili));
+  ill11iii.log("保存的 Header Params:", JSON.stringify(IIlii));
+  ill11iii.log("保存的 Original URL:", i1lIIii1);
+  ill11iii.log("数据已保存到持久化存储-Eric为您提供");
+  ill11iii.msg("获取数据成功", "数据已持久化保存", "");
+  ill11iii.done();
+}
+function Env(t, e) {
+  class s {
+    constructor(t) {
+      this.env = t;
+    }
+    send(t, e = "GET") {
+      t = "string" == typeof t ? {
+        url: t
+      } : t;
+      let s = this.get;
+      "POST" === e && (s = this.post);
+      return new Promise((e, a) => {
+        s.call(this, t, (t, s, r) => {
+          t ? a(t) : e(s);
+        });
+      });
+    }
+    get(t) {
+      return this.send.call(this.env, t);
+    }
+    post(t) {
+      return this.send.call(this.env, t, "POST");
+    }
+  }
+  return new class {
+    constructor(t, e) {
+      this.name = t;
+      this.http = new s(this);
+      this.data = null;
+      this.dataFile = "box.dat";
+      this.logs = [];
+      this.isMute = false;
+      this.isNeedRewrite = false;
+      this.logSeparator = "\n";
+      this.encoding = "utf-8";
+      this.startTime = new Date().getTime();
+      Object.assign(this, e);
+      this.log("", `🔔${this.name}, 开始!`);
+    }
+    getEnv() {
+      return "undefined" != typeof $environment && $environment["surge-version"] ? "Surge" : "undefined" != typeof $environment && $environment["stash-version"] ? "Stash" : "undefined" != typeof module && module.exports ? "Node.js" : "undefined" != typeof $task ? "Quantumult X" : "undefined" != typeof $loon ? "Loon" : "undefined" != typeof $rocket ? "Shadowrocket" : undefined;
+    }
+    isNode() {
+      return "Node.js" === this.getEnv();
+    }
+    isQuanX() {
+      return "Quantumult X" === this.getEnv();
+    }
+    isSurge() {
+      return "Surge" === this.getEnv();
+    }
+    isLoon() {
+      return "Loon" === this.getEnv();
+    }
+    isShadowrocket() {
+      return "Shadowrocket" === this.getEnv();
+    }
+    isStash() {
+      return "Stash" === this.getEnv();
+    }
+    toObj(t, e = null) {
+      try {
+        return JSON.parse(t);
+      } catch {
+        return e;
+      }
+    }
+    toStr(t, e = null) {
+      try {
+        return JSON.stringify(t);
+      } catch {
+        return e;
+      }
+    }
+    getjson(t, e) {
+      let s = e;
+      const a = this.getdata(t);
+      if (a) try {
+        s = JSON.parse(this.getdata(t));
+      } catch {}
+      return s;
+    }
+    setjson(t, e) {
+      try {
+        return this.setdata(JSON.stringify(t), e);
+      } catch {
+        return false;
+      }
+    }
+    getScript(t) {
+      return new Promise(e => {
+        this.get({
+          url: t
+        }, (t, s, a) => e(a));
+      });
+    }
+    runScript(t, e) {
+      return new Promise(s => {
+        let a = this.getdata("@chavy_boxjs_userCfgs.httpapi");
+        a = a ? a.replace(/\n/g, "").trim() : a;
+        let r = this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");
+        r = r ? 1 * r : 20;
+        r = e && e.timeout ? e.timeout : r;
+        const [i, o] = a.split("@"),
+          n = {
+            url: `http://${o}/v1/scripting/evaluate`,
+            body: {
+              script_text: t,
+              mock_type: "cron",
+              timeout: r
+            },
+            headers: {
+              "X-Key": i,
+              Accept: "*/*"
+            },
+            timeout: r
+          };
+        this.post(n, (t, e, a) => s(a));
+      }).catch(t => this.logErr(t));
+    }
+    loaddata() {
+      if (!this.isNode()) return {};
+      {
+        this.fs = this.fs ? this.fs : require("fs");
+        this.path = this.path ? this.path : require("path");
+        const t = this.path.resolve(this.dataFile),
+          e = this.path.resolve(process.cwd(), this.dataFile),
+          s = this.fs.existsSync(t),
+          a = !s && this.fs.existsSync(e);
+        if (!s && !a) return {};
+        {
+          const a = s ? t : e;
+          try {
+            return JSON.parse(this.fs.readFileSync(a));
+          } catch (t) {
+            return {};
+          }
+        }
+      }
+    }
+    writedata() {
+      if (this.isNode()) {
+        this.fs = this.fs ? this.fs : require("fs");
+        this.path = this.path ? this.path : require("path");
+        const t = this.path.resolve(this.dataFile),
+          e = this.path.resolve(process.cwd(), this.dataFile),
+          s = this.fs.existsSync(t),
+          a = !s && this.fs.existsSync(e),
+          r = JSON.stringify(this.data);
+        s ? this.fs.writeFileSync(t, r) : a ? this.fs.writeFileSync(e, r) : this.fs.writeFileSync(t, r);
+      }
+    }
+    lodash_get(t, e, s) {
+      const a = e.replace(/\[(\d+)\]/g, ".$1").split(".");
+      let r = t;
+      for (const t of a) if (r = Object(r)[t], undefined === r) return s;
+      return r;
+    }
+    lodash_set(t, e, s) {
+      return Object(t) !== t ? t : (Array.isArray(e) || (e = e.toString().match(/[^.[\]]+/g) || []), e.slice(0, -1).reduce((t, s, a) => Object(t[s]) === t[s] ? t[s] : t[s] = Math.abs(e[a + 1]) >> 0 == +e[a + 1] ? [] : {}, t)[e[e.length - 1]] = s, t);
+    }
+    getdata(t) {
+      let e = this.getval(t);
+      if (/^@/.test(t)) {
+        const [, s, a] = /^@(.*?)\.(.*?)$/.exec(t),
+          r = s ? this.getval(s) : "";
+        if (r) try {
+          const t = JSON.parse(r);
+          e = t ? this.lodash_get(t, a, "") : e;
+        } catch (t) {
+          e = "";
+        }
+      }
+      return e;
+    }
+    setdata(t, e) {
+      let s = false;
+      if (/^@/.test(e)) {
+        const [, a, r] = /^@(.*?)\.(.*?)$/.exec(e),
+          i = this.getval(a),
+          o = a ? "null" === i ? null : i || "{}" : "{}";
+        try {
+          const e = JSON.parse(o);
+          this.lodash_set(e, r, t);
+          s = this.setval(JSON.stringify(e), a);
+        } catch (e) {
+          const i = {};
+          this.lodash_set(i, r, t);
+          s = this.setval(JSON.stringify(i), a);
+        }
+      } else s = this.setval(t, e);
+      return s;
+    }
+    getval(t) {
+      switch (this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+          return $persistentStore.read(t);
+        case "Quantumult X":
+          return $prefs.valueForKey(t);
+        case "Node.js":
+          this.data = this.loaddata();
+          return this.data[t];
+        default:
+          return this.data && this.data[t] || null;
+      }
+    }
+    setval(t, e) {
+      switch (this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+          return $persistentStore.write(t, e);
+        case "Quantumult X":
+          return $prefs.setValueForKey(t, e);
+        case "Node.js":
+          this.data = this.loaddata();
+          this.data[e] = t;
+          this.writedata();
+          return true;
+        default:
+          return this.data && this.data[e] || null;
+      }
+    }
+    initGotEnv(t) {
+      this.got = this.got ? this.got : require("got");
+      this.cktough = this.cktough ? this.cktough : require("tough-cookie");
+      this.ckjar = this.ckjar ? this.ckjar : new this.cktough.CookieJar();
+      t && (t.headers = t.headers ? t.headers : {}, undefined === t.headers.Cookie && undefined === t.cookieJar && (t.cookieJar = this.ckjar));
+    }
+    get(t, e = () => {}) {
+      switch (t.headers && (delete t.headers["Content-Type"], delete t.headers["Content-Length"], delete t.headers["content-type"], delete t.headers["content-length"]), t.params && (t.url += "?" + this.queryStr(t.params)), this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+        default:
+          this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, {
+            "X-Surge-Skip-Scripting": false
+          }));
+          $httpClient.get(t, (t, s, a) => {
+            !t && s && (s.body = a, s.statusCode = s.status ? s.status : s.statusCode, s.status = s.statusCode);
+            e(t, s, a);
+          });
+          break;
+        case "Quantumult X":
+          this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, {
+            hints: false
+          }));
+          $task.fetch(t).then(t => {
+            const {
+              statusCode: s,
+              statusCode: a,
+              headers: r,
+              body: i,
+              bodyBytes: o
+            } = t;
+            e(null, {
+              status: s,
+              statusCode: a,
+              headers: r,
+              body: i,
+              bodyBytes: o
+            }, i, o);
+          }, t => e(t && t.error || "UndefinedError"));
+          break;
+        case "Node.js":
+          let s = require("iconv-lite");
+          this.initGotEnv(t);
+          this.got(t).on("redirect", (t, e) => {
+            try {
+              if (t.headers["set-cookie"]) {
+                const s = t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();
+                s && this.ckjar.setCookieSync(s, null);
+                e.cookieJar = this.ckjar;
+              }
+            } catch (t) {
+              this.logErr(t);
+            }
+          }).then(t => {
+            const {
+                statusCode: a,
+                statusCode: r,
+                headers: i,
+                rawBody: o
+              } = t,
+              n = s.decode(o, this.encoding);
+            e(null, {
+              status: a,
+              statusCode: r,
+              headers: i,
+              rawBody: o,
+              body: n
+            }, n);
+          }, t => {
+            const {
+              message: a,
+              response: r
+            } = t;
+            e(a, r, r && s.decode(r.rawBody, this.encoding));
+          });
+      }
+    }
+    post(t, e = () => {}) {
+      const s = t.method ? t.method.toLocaleLowerCase() : "post";
+      switch (t.body && t.headers && !t.headers["Content-Type"] && !t.headers["content-type"] && (t.headers["content-type"] = "application/x-www-form-urlencoded"), t.headers && (delete t.headers["Content-Length"], delete t.headers["content-length"]), this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+        default:
+          this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, {
+            "X-Surge-Skip-Scripting": false
+          }));
+          $httpClient[s](t, (t, s, a) => {
+            !t && s && (s.body = a, s.statusCode = s.status ? s.status : s.statusCode, s.status = s.statusCode);
+            e(t, s, a);
+          });
+          break;
+        case "Quantumult X":
+          t.method = s;
+          this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, {
+            hints: false
+          }));
+          $task.fetch(t).then(t => {
+            const {
+              statusCode: s,
+              statusCode: a,
+              headers: r,
+              body: i,
+              bodyBytes: o
+            } = t;
+            e(null, {
+              status: s,
+              statusCode: a,
+              headers: r,
+              body: i,
+              bodyBytes: o
+            }, i, o);
+          }, t => e(t && t.error || "UndefinedError"));
+          break;
+        case "Node.js":
+          let a = require("iconv-lite");
+          this.initGotEnv(t);
+          const {
+            url: r,
+            ...i
+          } = t;
+          this.got[s](r, i).then(t => {
+            const {
+                statusCode: s,
+                statusCode: r,
+                headers: i,
+                rawBody: o
+              } = t,
+              n = a.decode(o, this.encoding);
+            e(null, {
+              status: s,
+              statusCode: r,
+              headers: i,
+              rawBody: o,
+              body: n
+            }, n);
+          }, t => {
+            const {
+              message: s,
+              response: r
+            } = t;
+            e(s, r, r && a.decode(r.rawBody, this.encoding));
+          });
+      }
+    }
+    time(t, e = null) {
+      const s = e ? new Date(e) : new Date();
+      let a = {
+        "M+": s.getMonth() + 1,
+        "d+": s.getDate(),
+        "H+": s.getHours(),
+        "m+": s.getMinutes(),
+        "s+": s.getSeconds(),
+        "q+": Math.floor((s.getMonth() + 3) / 3),
+        S: s.getMilliseconds()
+      };
+      /(y+)/.test(t) && (t = t.replace(RegExp.$1, (s.getFullYear() + "").substr(4 - RegExp.$1.length)));
+      for (let e in a) new RegExp("(" + e + ")").test(t) && (t = t.replace(RegExp.$1, 1 == RegExp.$1.length ? a[e] : ("00" + a[e]).substr(("" + a[e]).length)));
+      return t;
+    }
+    queryStr(t) {
+      let e = "";
+      for (const s in t) {
+        let a = t[s];
+        null != a && "" !== a && ("object" == typeof a && (a = JSON.stringify(a)), e += `${s}=${a}&`);
+      }
+      e = e.substring(0, e.length - 1);
+      return e;
+    }
+    msg(e = t, s = "", a = "", r) {
+      const i = t => {
+        switch (typeof t) {
+          case undefined:
+            return t;
+          case "string":
+            switch (this.getEnv()) {
+              case "Surge":
+              case "Stash":
+              default:
+                return {
+                  url: t
+                };
+              case "Loon":
+              case "Shadowrocket":
+                return t;
+              case "Quantumult X":
+                return {
+                  "open-url": t
+                };
+              case "Node.js":
+                return;
+            }
+          case "object":
+            switch (this.getEnv()) {
+              case "Surge":
+              case "Stash":
+              case "Shadowrocket":
+              default:
+                {
+                  let e = t.url || t.openUrl || t["open-url"];
+                  return {
+                    url: e
+                  };
+                }
+              case "Loon":
+                {
+                  let e = t.openUrl || t.url || t["open-url"],
+                    s = t.mediaUrl || t["media-url"];
+                  return {
+                    openUrl: e,
+                    mediaUrl: s
+                  };
+                }
+              case "Quantumult X":
+                {
+                  let e = t["open-url"] || t.url || t.openUrl,
+                    s = t["media-url"] || t.mediaUrl,
+                    a = t["update-pasteboard"] || t.updatePasteboard;
+                  return {
+                    "open-url": e,
+                    "media-url": s,
+                    "update-pasteboard": a
+                  };
+                }
+              case "Node.js":
+                return;
+            }
+          default:
+            return;
+        }
+      };
+      if (!this.isMute) switch (this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+        default:
+          $notification.post(e, s, a, i(r));
+          break;
+        case "Quantumult X":
+          $notify(e, s, a, i(r));
+          break;
+        case "Node.js":
+      }
+      if (!this.isMuteLog) {
+        let t = ["", "==============📣系统通知📣=============="];
+        t.push(e);
+        s && t.push(s);
+        a && t.push(a);
+        console.log(t.join("\n"));
+        this.logs = this.logs.concat(t);
+      }
+    }
+    log(...t) {
+      t.length > 0 && (this.logs = [...this.logs, ...t]);
+      console.log(t.join(this.logSeparator));
+    }
+    logErr(t, e) {
+      switch (this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+        case "Quantumult X":
+        default:
+          this.log("", `❗️${this.name}, 错误!`, t);
+          break;
+        case "Node.js":
+          this.log("", `❗️${this.name}, 错误!`, t.stack);
+      }
+    }
+    wait(t) {
+      return new Promise(e => setTimeout(e, t));
+    }
+    done(t = {}) {
+      const e = new Date().getTime(),
+        s = (e - this.startTime) / 1000;
+      switch (this.log("", `🔔${this.name}, 结束! 🕛 ${s} 秒`), this.log(), this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+        case "Quantumult X":
+        default:
+          $done(t);
+          break;
+        case "Node.js":
+          process.exit(1);
+      }
+    }
+  }(t, e);
+}
+去;
