@@ -91,10 +91,7 @@ function Env(t, e) {
       Object.assign(this, e);
       this.log("", `🔔${this.name}, 开始!`);
     }
-
-    // 此处保留所有原始方法
-  })(t, e);
-}
+    
     getEnv() {
       return "undefined" != typeof $environment && $environment["surge-version"] ? "Surge" : "undefined" != typeof $environment && $environment["stash-version"] ? "Stash" : "undefined" != typeof module && module.exports ? "Node.js" : "undefined" != typeof $task ? "Quantumult X" : "undefined" != typeof $loon ? "Loon" : "undefined" != typeof $rocket ? "Shadowrocket" : undefined;
     }
