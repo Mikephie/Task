@@ -1,55 +1,65 @@
-//Thu Jan 09 2025 04:30:11 GMT+0000 (Coordinated Universal Time)
-//Base:https://github.com/echo094/decode-js
-//Modify:https://github.com/smallfawn/decode_action
-const l1IIil = new Env("酷狗概念版自动领取VIP");
-function il11ii1(iIlliii) {
-  if (typeof $prefs !== "undefined") return JSON.parse($prefs.valueForKey(iIlliii)) || {};else {
-    if (typeof $persistentStore !== "undefined") return JSON.parse($persistentStore.read(iIlliii)) || {};else {
-      if (typeof $persistent !== "undefined") return JSON.parse($persistent.getItem(iIlliii)) || {};
-    }
-  }
+const env = new Env("酷狗概念版自动领取VIP");
+
+function getStoredParams(key) {
+  if (typeof $prefs !== "undefined") return JSON.parse($prefs.valueForKey(key)) || {};
+  else if (typeof $persistentStore !== "undefined") return JSON.parse($persistentStore.read(key)) || {};
+  else if (typeof $persistent !== "undefined") return JSON.parse($persistent.getItem(key)) || {};
   return {};
 }
-let IliIIII = il11ii1("urlParams"),
-  i1IIllil = il11ii1("headerParams"),
-  I1IiIiIl = il11ii1("originalUrl"),
-  iI1111iI = "https://gateway.kugou.com/youth/v1/recharge/receive_vip_listen_song?appid=" + IliIIII.appid + "&clientver=" + IliIIII.clientver + "&clienttime=" + IliIIII.clienttime + "&mid=" + IliIIII.mid + "&uuid=" + IliIIII.uuid + "&dfid=" + IliIIII.dfid + "&token=" + IliIIII.token + "&userid=" + IliIIII.userid + "&srcappid=" + IliIIII.srcappid + "&signature=" + IliIIII.signature,
-  IiiliI = {
-    ":authority": i1IIllil[":authority"],
-    "content-type": i1IIllil["content-type"],
-    "kg-rf": i1IIllil["kg-rf"],
-    "accept": i1IIllil.accept,
-    "kg-thash": i1IIllil["kg-thash"],
-    "accept-language": i1IIllil["accept-language"],
-    "accept-encoding": i1IIllil["accept-encoding"],
-    "kg-rec": i1IIllil["kg-rec"],
-    "user-agent": i1IIllil["user-agent"],
-    "kg-rc": i1IIllil["kg-rc"],
-    "kg-fake": i1IIllil["kg-fake"],
-    "content-length": i1IIllil["content-length"],
-    "uni-useragent": i1IIllil["uni-useragent"]
-  };
-const l1I1Il1 = {
-  "url": iI1111iI,
-  "headers": IiiliI
+
+let urlParams = getStoredParams("urlParams"),
+    headerParams = getStoredParams("headerParams"),
+    originalUrl = getStoredParams("originalUrl"),
+    apiUrl = "https://gateway.kugou.com/youth/v1/recharge/receive_vip_listen_song?appid=" 
+              + urlParams.appid 
+              + "&clientver=" + urlParams.clientver 
+              + "&clienttime=" + urlParams.clienttime 
+              + "&mid=" + urlParams.mid 
+              + "&uuid=" + urlParams.uuid 
+              + "&dfid=" + urlParams.dfid 
+              + "&token=" + urlParams.token 
+              + "&userid=" + urlParams.userid 
+              + "&srcappid=" + urlParams.srcappid 
+              + "&signature=" + urlParams.signature,
+    requestHeaders = {
+      ":authority": headerParams[":authority"],
+      "content-type": headerParams["content-type"],
+      "kg-rf": headerParams["kg-rf"],
+      "accept": headerParams.accept,
+      "kg-thash": headerParams["kg-thash"],
+      "accept-language": headerParams["accept-language"],
+      "accept-encoding": headerParams["accept-encoding"],
+      "kg-rec": headerParams["kg-rec"],
+      "user-agent": headerParams["user-agent"],
+      "kg-rc": headerParams["kg-rc"],
+      "kg-fake": headerParams["kg-fake"],
+      "content-length": headerParams["content-length"],
+      "uni-useragent": headerParams["uni-useragent"]
+    };
+
+const requestOptions = {
+  "url": apiUrl,
+  "headers": requestHeaders
 };
-l1IIil.post(l1I1Il1, function (l11iili1, iIlil11l, liI1Iiii) {
-  if (l11iili1) {
-    {
-      l1IIil.log("请求出错:", l11iili1);
-      l1IIil.done();
-      return;
-    }
+
+env.post(requestOptions, function (error, response, body) {
+  if (error) {
+    env.log("请求出错:", error);
+    env.done();
+    return;
   }
+  
   try {
-    l1IIil.log(liI1Iiii);
-    const liI111I = JSON.parse(liI1Iiii);
-    liI111I.status === 1 ? l1IIil.msg("获取成功", "成功领取VIP", "") : l1IIil.msg("获取失败", "当天已领取无需再领", "");
-  } catch (l1ii1Ill) {
-    l1IIil.log("解析响应数据出错:", l1ii1Ill);
-    l1IIil.msg("解析失败", "无法解析服务器返回的数据", "");
+    env.log(body);
+    const responseData = JSON.parse(body);
+    responseData.status === 1 
+      ? env.msg("获取成功", "成功领取VIP", "") 
+      : env.msg("获取失败", "当天已领取无需再领", "");
+  } catch (parseError) {
+    env.log("解析响应数据出错:", parseError);
+    env.msg("解析失败", "无法解析服务器返回的数据", "");
   } finally {
-    l1IIil.done();
+    env.done();
   }
 });
 function Env(t, e) {
