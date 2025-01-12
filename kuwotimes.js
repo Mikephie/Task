@@ -133,11 +133,14 @@ function Env(name) {
     get: this.get.bind(this),
     post: this.post.bind(this),
   };
-  this.data = {};
+  this.data = null;
   this.logs = [];
   this.logSeparator = "\n";
   this.startTime = new Date().getTime();
+  this.isBoxJs = false;
+
   this.getval = (key) => {
+    if (this.isBoxJs) return this.getBoxJsVal(key);
     switch (true) {
       case typeof $persistentStore !== "undefined": // Surge/Loon
         return $persistentStore.read(key);
@@ -146,10 +149,12 @@ function Env(name) {
       case typeof process !== "undefined": // Node.js
         return process.env[key];
       default:
-        return this.data[key] || null;
+        return this.data ? this.data[key] : null;
     }
   };
+
   this.setdata = (val, key) => {
+    if (this.isBoxJs) return this.setBoxJsVal(val, key);
     switch (true) {
       case typeof $persistentStore !== "undefined": // Surge/Loon
         return $persistentStore.write(val, key);
@@ -161,6 +166,28 @@ function Env(name) {
         return (this.data[key] = val);
     }
   };
+
+  this.getBoxJsVal = (key) => {
+    const boxData = this.getdata("@boxjs.userprefs") || "{}";
+    try {
+      return JSON.parse(boxData)[key] || null;
+    } catch {
+      return null;
+    }
+  };
+
+  this.setBoxJsVal = (val, key) => {
+    const boxData = this.getdata("@boxjs.userprefs") || "{}";
+    try {
+      const parsed = JSON.parse(boxData);
+      parsed[key] = val;
+      this.setdata(JSON.stringify(parsed), "@boxjs.userprefs");
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   this.msg = (title, subtitle, body) => {
     switch (true) {
       case typeof $notification !== "undefined": // Surge/Loon
@@ -171,6 +198,7 @@ function Env(name) {
         console.log(`${title}\n${subtitle}\n${body}`);
     }
   };
+
   this.log = (...args) => console.log(...args);
   this.logErr = (err) => console.error(err);
   this.done = () => {
@@ -178,14 +206,17 @@ function Env(name) {
     console.log(`🔔${this.name}, 结束! 🕛 ${(endTime - this.startTime) / 1000} 秒`);
     if (typeof $done !== "undefined") $done();
   };
+
   this.get = (opts, callback) => {
     const method = "GET";
     this.send({ ...opts, method }, callback);
   };
+
   this.post = (opts, callback) => {
     const method = "POST";
     this.send({ ...opts, method }, callback);
   };
+
   this.send = (opts, callback) => {
     switch (true) {
       case typeof $httpClient !== "undefined": // Surge/Loon
