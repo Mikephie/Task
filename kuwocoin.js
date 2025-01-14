@@ -14,11 +14,11 @@
   ✅资产查询
 🎯重写脚本:
   [Script]
-http-request https://appi.kuwo.cn/api/automobile/kuwo/v1/configuration/signature script-path=https://raw.githubusercontent.com/MCdasheng/QuantumultX/main/Scripts/myScripts/kuwo.cookie.js, requires-body=true, timeout=60, enabled=false, tag=酷我音乐获取Cookies, img-url=https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png
+http-request ^https:\/\/appi\.kuwo\.cn\/api\/automobile\/kuwo\/v1\/configuration\/signature\?)/ script-path=https://raw.githubusercontent.com/General74110/Config/refs/heads/master/Script/Task/kuwo_Cookies.js, requires-body=true, timeout=60, enabled=false, tag=酷我音乐(积分)获取Cookies, img-url=https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png
 [MITM]
-hostname = appi.kuwo.cn
+hostname = *.kuwo.cn
 ⏰定时任务:
-  cron "0 9,11,13,15,17,19,21 * * *" script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kuwocoin.js, timeout=3000, tag=酷我音乐刷积分, img-url=https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png
+  cron "0 9,11,13,15,17,19,21 * * *" script-path=https://raw.githubusercontent.com/General74110/Config/refs/heads/master/Script/Task/kuwo.js, timeout=3000, tag=酷我音乐(积分), img-url=https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png
 🔍手动抓包: 
   开启抓包,进入网页登陆后的界面
   搜索url记录关键词"configuration\/signature"请求头中的Cookies里的 userid和 websid 分别填入BoxJs（userid=loginUid，websid=loginSid）
@@ -30,19 +30,28 @@ hostname = appi.kuwo.cn
   https://raw.githubusercontent.com/MCdasheng/QuantumultX/main/mcdasheng.boxjs.json（原作者版）
 
 
-
-
 */
 
-const $ = new Env("酷我音乐");
+const $ = new Env('酷我音乐');
+// 通知和日志设置
+let tz = $.getval('tz') || '1'; // 通知设置：0关闭通知，1开启通知
+const logs = 0; // 日志设置：0关闭日志，1开启日志
+const notify = $.isNode() ? require('./sendNotify') : '';
+let notifyMsg = []; // 声明 notifyMsg 数组，用于存储任务信息
 
-const loginUid = $.getdata("kw_loginUid");
-const loginSid = $.getdata("kw_loginSid");
+// 获取环境变量ID，适配不同环境
+let accounts = $.getdata('ID') || ($.isNode() ? process.env.ID : ''); // 在不同环境下处理
+if (logs) console.log(`读取到的 ID: ${accounts}`);
 
-if (loginUid == "" || loginSid == "") {
-  $.log("⚠️用户信息不全,请获取或填入信息!");
-  $.msg($.name, "⚠️用户信息不全,请获取或填入信息!");
+// 解析ID为账号数组
+let accountArr = accounts.split(/[,&]/).map(a => a.trim()); // 将多个账号信息用 , 或 & 隔开并拆分为数组
+let kuwoNameArr = [];
+
+// 验证环境变量格式
+if (accountArr.length === 0 || !accounts || !accounts.includes('@')) {
+        $.msg($.name, '', '⚠️ 未检测到有效Cookie 请更新！');
   $.done();
+  return;
 }
 
 const kw_headers = {
@@ -50,397 +59,503 @@ const kw_headers = {
   Origin: "https://h5app.kuwo.cn",
   Connection: "keep-alive",
   Accept: "application/json, text/plain, */*",
-  "User-Agent":
-    " Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KWMusic/10.5.3.0 DeviceModel/iPhone13,2 NetType/WIFI kuwopage",
-  "Accept-Language": " zh-CN,zh-Hans;q=0.9",
+  "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KWMusic/10.5.3.0 DeviceModel/iPhone13,2 NetType/WIFI kuwopage",
+  "Accept-Language": "zh-CN,zh-Hans;q=0.9",
   Referer: "https://h5app.kuwo.cn/",
   "Accept-Encoding": "gzip, deflate, br",
-  "User-Agent":
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KWMusic/10.5.3.0 DeviceModel/iPhone13,2 NetType/WIFI kuwopage",
 };
 
-$.notifyMsg = [];
+!(async () => {
+  $.log(`检测到 ${accountArr.length} 个有效账户`);
+ 
+  
 
-(async () => {
-  await novel();
-  await mobile();
-  await collect();
-  await box();
-  await loterry_free();
-  await loterry_free();
-  await new_sign();
-  await sign();
-  await sign();
-  await sign();
-  for (var i = 0; i < 20; i++) {
-    await video(); // 20次
-  }
-  for (var i = 0; i < 10; i++) {
-    await surprise(); //10次
-    await loterry_video(); // 8次
-  }
-})()
-  .catch((e) => $.logErr(e))
-  .finally(async () => {
-    var asset = await getAsset();
-    $.msg($.name, asset, $.notifyMsg.join("\n"));
-    $.done();
-  });
+  for (let i = 0; i < accountArr.length; i++) {
+    const ID = accountArr[i];
 
-async function novel() {
-  let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/everydaymusic/doListen?loginUid=${loginUid}&loginSid=${loginSid}&from=novel&goldNum=18`,
-    headers: kw_headers,
-  };
+    // 验证账户格式
+    if (!ID.includes('@')) {
+      $.log(`账户信息格式错误：${ID}，跳过此账户`);
+      continue;
+    }
 
-  return $.http.get(options).then((resp) => {
-    $.log("🟡正在执行每日小说任务...");
-    // $.log(resp.body);
-    var desc;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      desc = obj.data.description;
-      if (desc == "成功") desc = `🎉每日小说: ${desc}`;
-      else if (desc == "今天已完成任务") desc = `🟢每日小说: ${desc}`;
-      else if (desc == "用户未登录") desc = `🔴每日小说: ${desc}`;
-      else desc = `⚠️每日小说: ${desc}`;
+    const nickname = await getNickname(ID);
+    const displayName = nickname || `用户${i + 1}`;
+    notifyMsg = [`【এ${displayName}এ】`]; // 清空并初始化每个账号的通知内容
+    await getAsset(ID, displayName);
+    
+    if (nickname == null) {
+        const title = "酷我音乐(积分)";
+        const content = "⚠️ Cookie 已失效，请更新";
+    
+        if ($.isNode()) {
+            await notify.sendNotify(title, content); // Node.js 环境下使用 sendNotify
+          } else if ($.isLoon() || $.isQuanX() || $.isSurge()) 
+            {
+            $.msg(title, "", content); // 其他环境下使用 $.msg
+          } else {
+            console.log(title, content)
+          }
+    
+        $.done(); // 终止脚本
+        return;
+      }
+
+    await executeTasks(ID, displayName);
+
+    // 每个账号完成任务后立即发送通知
+    const message = notifyMsg.join("\n"); // 将通知内容合并为一个字符串
+    if ($.isNode()) {
+      await notify.sendNotify(`${$.name}`, message);
     } else {
-      desc = `❌每日小说: 错误!`;
-      $.log(resp.body);
+      $.msg(`${$.name}`, '', message);
     }
-    $.log(desc);
-    $.notifyMsg.push(desc);
-  });
-}
-
-async function mobile() {
-  let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/everydaymusic/doListen?loginUid=${loginUid}&loginSid=${loginSid}&from=mobile&goldNum=18`,
-    headers: kw_headers,
-  };
-
-  return $.http.get(options).then((resp) => {
-    $.log("🟡正在执行每日听歌任务...");
-    // $.log(resp.body);
-    var desc;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      desc = obj.data.description;
-      if (desc == "成功") desc = `🎉每日听歌: ${desc}`;
-      else if (desc == "今天已完成任务") desc = `🟢每日听歌: ${desc}`;
-      else if (desc == "用户未登录") desc = `🔴每日听歌: ${desc}`;
-      else desc = `⚠️每日听歌: ${desc}`;
-    } else {
-      desc = `❌每日听歌: 错误!`;
-      $.log(resp.body);
-    }
-    $.log(desc);
-    $.notifyMsg.push(desc);
-  });
-}
-
-async function collect() {
-  let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/everydaymusic/doListen?loginUid=${loginUid}&loginSid=${loginSid}&from=collect&goldNum=18`,
-    headers: kw_headers,
-  };
-
-  return $.http.get(options).then((resp) => {
-    $.log("🟡正在执行每日收藏任务...");
-    // $.log(resp.body);
-    var desc;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      desc = obj.data.description;
-      if (desc == "成功") desc = `🎉每日收藏: ${desc}`;
-      else if (desc == "今天已完成任务") desc = `🟢每日收藏: ${desc}`;
-      else if (desc == "用户未登录") desc = `🔴每日收藏: ${desc}`;
-      else desc = `⚠️每日收藏: ${desc}`;
-    } else {
-      desc = `❌每日收藏: 错误!`;
-      $.log(resp.body);
-    }
-    $.log(desc);
-    $.notifyMsg.push(desc);
-  });
-}
-
-async function video() {
-  let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/everydaymusic/doListen?loginUid=${loginUid}&loginSid=${loginSid}&from=videoadver&goldNum=58`,
-    headers: kw_headers,
-  };
-
-  return $.http.get(options).then((resp) => {
-    $.log("🟡正在执行创意视频任务...");
-    // $.log(resp.body);
-    var desc;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      desc = obj.data.description;
-      if (desc == "成功") desc = `🎉创意视频: ${desc}`;
-      else if (desc == "今天已完成任务") desc = `🟢创意视频: ${desc}`;
-      else if (desc == "用户未登录") desc = `🔴创意视频: ${desc}`;
-      else desc = `⚠️创意视频: ${desc}`;
-    } else {
-      desc = `❌创意视频: 错误!`;
-      $.log(resp.body);
-    }
-    $.log(desc);
-    $.notifyMsg.push(desc);
-  });
-}
-
-async function sign() {
-  let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/everydaymusic/doListen?loginUid=${loginUid}&loginSid=${loginSid}&from=sign&extraGoldNum=110`,
-    headers: kw_headers,
-  };
-
-  return $.http.get(options).then((resp) => {
-    $.log("🟡正在执行每日签到任务...");
-    // $.log(resp.body);
-    var desc;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      desc = obj.data.description;
-      if (desc == "成功") desc = `🎉每日签到: ${desc}`;
-      else if (desc == "今天已完成任务") desc = `🟢每日签到: ${desc}`;
-      else if (desc == "用户未登录") desc = `🔴每日签到: ${desc}`;
-      else if (desc == "已达到当日观看额外视频次数") desc = `🟢每日签到: ${desc}`;
-      else desc = `⚠️每日签到: ${desc}`;
-    } else {
-      desc = `❌每日签到: 错误!`;
-      $.log(resp.body);
-    }
-    $.log(desc);
-    $.notifyMsg.push(desc);
-  });
-}
-
-async function new_sign() {
-  let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/newUserSignList?loginUid=587513271&loginSid=1062618347`,
-    headers: kw_headers,
-  };
-  return $.http.get(options).then((resp) => {
-    $.log("🟡正在执行每日签到任务...");
-    // $.log(resp.body);
-    var desc;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      desc = obj.data.isSign;
-      if (desc == true) desc = `🟢每日签到: 成功!`;
-      else if (desc == "用户未登录") desc = `🔴每日签到: 失败`;
-    } else {
-      desc = `❌每日签到: 错误!`;
-      $.log(resp.body);
-    }
-    $.log(desc);
-    $.notifyMsg.push(desc);
-  });
-}
-
-async function loterry_free() {
-  let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/loterry/getLucky?loginUid=${loginUid}&loginSid=${loginSid}&type=free`,
-    headers: kw_headers,
-  };
-
-  return $.http.get(options).then((resp) => {
-    $.log("🟡正在执行免费抽奖任务...");
-    // $.log(resp.body);
-    var desc;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      desc = obj.data.loterryname ? `🎉免费抽奖: ${obj.data.loterryname}` : `❌免费抽奖: 错误!`;
-    } else desc = obj.msg ? `🔴免费抽奖: ${obj.msg}` : `❌免费抽奖: 错误!`;
-    if (desc == `🔴免费抽奖: 免费次数用完了`) {
-      desc = `🟢免费抽奖: 免费次数用完了`;
-    }
-    if (desc == `❌免费抽奖: 错误!`) {
-      $.log(resp.body);
-    }
-    $.log(desc);
-    $.notifyMsg.push(desc);
-  });
-}
-
-async function loterry_video() {
-  let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/loterry/getLucky?loginUid=${loginUid}&loginSid=${loginSid}&type=video`,
-    headers: kw_headers,
-  };
-
-  return $.http.get(options).then((resp) => {
-    $.log("🟡正在执行视频抽奖任务...");
-    // $.log(resp.body);
-    var desc;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      desc = obj.data.loterryname ? `🎉视频抽奖: ${obj.data.loterryname}` : `❌视频抽奖: 错误!`;
-    } else desc = obj.msg ? `🔴视频抽奖: ${obj.msg}` : `❌视频抽奖: 错误!`;
-    if (desc == `🔴视频抽奖: 视频次数用完了`) {
-      desc = `🟢视频抽奖: 视频次数用完了`;
-    }
-    if (desc == `❌视频抽奖: 错误!`) {
-      $.log(resp.body);
-    }
-    $.log(desc);
-    $.notifyMsg.push(desc);
-  });
-}
-
-async function surprise() {
-  var rand = Math.random() < 0.3 ? 68 : Math.random() < 0.6 ? 69 : 70;
-
-  let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/newDoListen?loginUid=${loginUid}&loginSid=${loginSid}&from=surprise&goldNum=${rand}&surpriseType=`,
-    headers: kw_headers,
-  };
-
-  return $.http.get(options).then((resp) => {
-    $.log("🟡正在执行惊喜任务...");
-    // $.log(resp.body);
-    var desc;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      desc = obj.data.description;
-      if (desc == "成功") desc = `🎉惊喜任务: ${desc}`;
-      else if (desc == "今天已完成任务") desc = `🟢惊喜任务: ${desc}`;
-      else if (desc == "用户未登录") desc = `🔴惊喜任务: ${desc}`;
-      else desc = `⚠️惊喜任务: ${desc}`;
-    } else {
-      desc = `❌惊喜任务: 错误!`;
-      $.log(resp.body);
-    }
-    $.log(desc);
-    $.notifyMsg.push(desc);
-  });
-}
-
-async function box() {
-  // 定时宝箱,可以强制领取,但不推荐!
-  var time = [];
-  var hour = new Date().getUTCHours() + 8;
-
-  if (hour >= 0) {
-    time.push("00-08");
   }
-  if (hour >= 8) {
-    time.push("08-10");
+})().catch((e) => $.logErr(e))
+  .finally(() => $.done());
+
+// 执行任务逻辑
+async function executeTasks(ID, displayName) {
+  $.log(`\n开始执行任务 - 账户：${displayName}`);
+  
+ 
+  await novel(ID);
+  await mobile(ID);
+  await collect(ID);
+  await box(ID);  // 不再传递 `time` 参数
+  await loterry_free(ID);
+  await new_sign(ID);
+  await sign(ID);
+
+  for (let i = 0; i < 20; i++) {
+    await video(ID);
   }
-  if (hour >= 10) {
-    time.push("10-12");
+  for (let j = 0; j < 10; j++) {
+    await surprise(ID);
   }
-  if (hour >= 12) {
-    time.push("12-14");
-  }
-  if (hour >= 14) {
-    time.push("14-16");
-  }
-  if (hour >= 16) {
-    time.push("16-18");
-  }
-  if (hour >= 18) {
-    time.push("18-20");
-  }
-  if (hour >= 20) {
-    time.push("20-24");
+  for (let k = 0; k < 8; k++) {
+    await loterry_video(ID);
   }
 
-  var len = time.length;
-
-  await box_new(time[len - 1]);
-
-  for (var i = 0; i < len - 1; i++) {
-    // console.log(time[i]);
-    await box_old(time[i]);
-  }
+  //notifyMsg.push(`完成任务 - 账户：${displayName}`);
 }
 
-async function box_new(time) {
-  var rand = Math.random() < 0.3 ? 28 : Math.random() < 0.6 ? 29 : 30;
 
-  let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/new/boxRenew?loginUid=${loginUid}&loginSid=${loginSid}&action=new&time=${time}&goldNum=${rand}`,
-    headers: kw_headers,
-  };
 
-  return $.http.get(options).then((resp) => {
-    $.log("🟡正在执行定时宝箱任务...");
-    // $.log(resp.body);
-    var desc;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      desc = obj.data.description;
-      if (desc == "成功") desc = `🎉定时宝箱: ${desc}`;
-      else if (desc == "今天已完成任务") desc = `🟢定时宝箱: ${desc}`;
-      else if (desc == "用户未登录") desc = `🔴定时宝箱: ${desc}`;
-      else desc = `⚠️定时宝箱: ${desc}`;
-    } else {
-      desc = `❌定时宝箱: 错误!`;
-      $.log(resp.body);
-    }
-    $.log(desc);
-    $.notifyMsg.push(desc);
+// 清除环境变量
+async function clearEnvVars() {
+  $.setdata('', 'ID');
+}
+
+// 获取昵称
+async function getNickname(ID) {
+let [loginUid] = ID.split('@'); 
+  return new Promise((resolve) => {
+   let url = {
+      url : `https://integralapi.kuwo.cn/api/v1/online/sign/v1/music/userBase?loginUid=${loginUid}`,
+      headers: kw_headers,
+    };
+
+    $.get(url, (err, resp, data) => {
+        if (logs == 1) {
+            console.log('查询昵称响应体：',data);
+            }
+      try {
+        if (err) {
+          $.logErr(`获取昵称失败：${err}`);
+          resolve('');
+          return;
+        }
+
+        data = JSON.parse(data);
+        const nickname = data.data.nickname;
+        resolve(nickname);
+      } catch (e) {
+        $.logErr(e);
+        resolve('');
+      }
+    });
   });
 }
 
-async function box_old(time) {
-  var rand = Math.random() < 0.3 ? 28 : Math.random() < 0.6 ? 29 : 30;
 
+async function getAsset(ID) {
+  const [loginUid, loginSid] = ID.split('@');
+    let options = {
+        url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/earningUserSignList?loginUid=${loginUid}&loginSid=${loginSid}`,
+        headers: kw_headers,
+    };
+
+    return $.http.get(options).then((resp) => {
+        $.log("🟡正在查询资产...");
+        if (logs == 1) {
+        console.log('查询资产响应体：',resp.body);
+        }
+        var score;
+        var obj = JSON.parse(resp.body);
+       
+        if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
+            score = obj.data.remainScore ? obj.data.remainScore : 0;
+            if (score != 0) {
+                var money = (score / 10000).toFixed(2);
+                desc = `💰${score} --> 💴${money} CNY`;
+            } else desc = `🔴资产查询失败!`;
+        } else {
+            desc = `❌资产查询: 错误!`;
+            $.log(resp.body);
+        }
+        $.asset = obj;
+        $.log(desc);
+        notifyMsg.push(desc);
+        return desc;
+    });
+}
+
+async function novel(ID) {
+  const [loginUid, loginSid] = ID.split('@');
+  
   let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/new/boxRenew?loginUid=${loginUid}&loginSid=${loginSid}&action=old&time=${time}&goldNum=${rand}`,
-    headers: kw_headers,
+      url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/everydaymusic/doListen?loginUid=${loginUid}&loginSid=${loginSid}&from=novel&goldNum=18`,
+      headers: kw_headers,
   };
 
   return $.http.get(options).then((resp) => {
-    $.log("🟡正在执行补领宝箱任务...");
-    // $.log(resp.body);
-    var desc;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      desc = obj.data.description;
-      if (desc == "成功") desc = `🎉补领宝箱: ${desc}`;
-      else if (desc == "今天已完成任务") desc = `🟢补领宝箱: ${desc}`;
-      else if (desc == "用户未登录") desc = `🔴补领宝箱: ${desc}`;
-      else desc = `⚠️补领宝箱: ${desc}`;
-    } else {
-      desc = `❌补领宝箱: 错误!`;
-      $.log(resp.body);
-    }
-    $.log(desc);
-    $.notifyMsg.push(desc);
+      $.log("🟡正在执行每日小说任务...");
+      var desc;
+      try {
+          var obj = JSON.parse(resp.body);
+          if (obj.code == 200 && obj.msg == "success" && obj.success === true) {
+              desc = obj.data.description;
+              if (desc === "成功") desc = `🎉每日小说: ${desc}`;
+              else if (desc === "今天已完成任务") desc = `🟢每日小说: ${desc}`;
+              else if (desc === "用户未登录") desc = `🔴每日小说: ${desc}`;
+              else desc = `⚠️每日小说: ${desc}`;
+          } else {
+              desc = `❌每日小说: 错误!`;
+              $.log(resp.body);
+          }
+      } catch (e) {
+          desc = `❌每日小说: 响应解析失败!`;
+          $.logErr(e);
+      }
+      
+      $.log(desc);
+      notifyMsg.push(desc);
   });
 }
 
-async function getAsset() {
-  let options = {
-    url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/earningUserSignList?loginUid=${loginUid}&loginSid=${loginSid}`,
-    headers: kw_headers,
-  };
+async function mobile(ID) {
+  const [loginUid, loginSid] = ID.split('@');
+    let options = {
+        url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/everydaymusic/doListen?loginUid=${loginUid}&loginSid=${loginSid}&from=mobile&goldNum=18`,
+        headers: kw_headers,
+    };
 
-  return $.http.get(options).then((resp) => {
-    $.log("🟡正在查询资产...");
-    // $.log(resp.body);
-    var score;
-    var obj = JSON.parse(resp.body);
-    if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
-      score = obj.data.remainScore ? obj.data.remainScore : 0;
-      if (score != 0) {
-        var money = (score / 10000).toFixed(2);
-        desc = `💰${score} --> 💴${money} CNY`;
-      } else desc = `🔴资产查询失败!`;
-    } else {
-      desc = `❌资产查询: 错误!`;
-      $.log(resp.body);
-    }
-    $.log(desc);
-    $.notifyMsg.push(desc);
-    return desc;
-  });
+    return $.http.get(options).then((resp) => {
+        $.log("🟡正在执行每日听歌任务...");
+        // $.log(resp.body);
+        var desc;
+        var obj = JSON.parse(resp.body);
+        if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
+            desc = obj.data.description;
+            if (desc == "成功") desc = `🎉每日听歌: ${desc}`;
+            else if (desc == "今天已完成任务") desc = `🟢每日听歌: ${desc}`;
+            else if (desc == "用户未登录") desc = `🔴每日听歌: ${desc}`;
+            else desc = `⚠️每日听歌: ${desc}`;
+        } else {
+            desc = `❌每日听歌: 错误!`;
+            $.log(resp.body);
+        }
+        $.log(desc);
+        notifyMsg.push(desc);
+    });
 }
+
+async function collect(ID) {
+  const [loginUid, loginSid] = ID.split('@');
+    let options = {
+        url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/everydaymusic/doListen?loginUid=${loginUid}&loginSid=${loginSid}&from=collect&goldNum=18`,
+        headers: kw_headers,
+    };
+
+    return $.http.get(options).then((resp) => {
+        $.log("🟡正在执行每日收藏任务...");
+        // $.log(resp.body);
+        var desc;
+        var obj = JSON.parse(resp.body);
+        if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
+            desc = obj.data.description;
+            if (desc == "成功") desc = `🎉每日收藏: ${desc}`;
+            else if (desc == "今天已完成任务") desc = `🟢每日收藏: ${desc}`;
+            else if (desc == "用户未登录") desc = `🔴每日收藏: ${desc}`;
+            else desc = `⚠️每日收藏: ${desc}`;
+        } else {
+            desc = `❌每日收藏: 错误!`;
+            $.log(resp.body);
+        }
+        $.log(desc);
+        notifyMsg.push(desc);
+    });
+}
+
+async function video(ID) {
+  const [loginUid, loginSid] = ID.split('@');
+    let options = {
+        url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/everydaymusic/doListen?loginUid=${loginUid}&loginSid=${loginSid}&from=videoadver&goldNum=58`,
+        headers: kw_headers,
+    };
+
+    return $.http.get(options).then((resp) => {
+        $.log("🟡正在执行创意视频任务...");
+        // $.log(resp.body);
+        var desc;
+        var obj = JSON.parse(resp.body);
+        if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
+            desc = obj.data.description;
+            if (desc == "成功") desc = `🎉创意视频: ${desc}`;
+            else if (desc == "今天已完成任务") desc = `🟢创意视频: ${desc}`;
+            else if (desc == "用户未登录") desc = `🔴创意视频: ${desc}`;
+            else desc = `⚠️创意视频: ${desc}`;
+        } else {
+            desc = `❌创意视频: 错误!`;
+            $.log(resp.body);
+        }
+        $.log(desc);
+        notifyMsg.push(desc);
+    });
+}
+
+async function sign(ID) {
+  const [loginUid, loginSid] = ID.split('@');
+    let options = {
+        url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/everydaymusic/doListen?loginUid=${loginUid}&loginSid=${loginSid}&from=sign&extraGoldNum=110`,
+        headers: kw_headers,
+    };
+
+    return $.http.get(options).then((resp) => {
+        $.log("🟡正在执行每日签到任务...");
+        // $.log(resp.body);
+        var desc;
+        var obj = JSON.parse(resp.body);
+        if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
+            desc = obj.data.description;
+            if (desc == "成功") desc = `🎉每日签到: ${desc}`;
+            else if (desc == "今天已完成任务") desc = `🟢每日签到: ${desc}`;
+            else if (desc == "用户未登录") desc = `🔴每日签到: ${desc}`;
+            else if (desc == "已达到当日观看额外视频次数") desc = `🟢每日签到: ${desc}`;
+            else desc = `⚠️每日签到: ${desc}`;
+        } else {
+            desc = `❌每日签到: 错误!`;
+            $.log(resp.body);
+        }
+        $.log(desc);
+        notifyMsg.push(desc);
+    });
+}
+
+async function new_sign(ID) {
+  const [loginUid, loginSid] = ID.split('@');
+    let options = {
+        url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/newUserSignList?loginUid=${loginUid}&loginSid=${loginSid}`,
+        headers: kw_headers,
+    };
+    return $.http.get(options).then((resp) => {
+        $.log("🟡正在执行每日签到任务...");
+        // $.log(resp.body);
+        var desc;
+        var obj = JSON.parse(resp.body);
+        if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
+            desc = obj.data.isSign;
+            if (desc == true) desc = `🟢每日签到: 成功!`;
+            else if (desc == "用户未登录") desc = `🔴每日签到: 失败`;
+        } else {
+            desc = `❌每日签到: 错误!`;
+            $.log(resp.body);
+        }
+        $.log(desc);
+        notifyMsg.push(desc);
+    });
+}
+
+async function loterry_free(ID) {
+  const [loginUid, loginSid] = ID.split('@');
+    let options = {
+        url: `https://integralapi.kuwo.cn/api/v1/online/sign/loterry/getLucky?loginUid=${loginUid}&loginSid=${loginSid}&type=free`,
+        headers: kw_headers,
+    };
+
+    return $.http.get(options).then((resp) => {
+        $.log("🟡正在执行免费抽奖任务...");
+        // $.log(resp.body);
+        var desc;
+        var obj = JSON.parse(resp.body);
+        if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
+            desc = obj.data.loterryname ? `🎉免费抽奖: ${obj.data.loterryname}` : `❌免费抽奖: 错误!`;
+        } else desc = obj.msg ? `🔴免费抽奖: ${obj.msg}` : `❌免费抽奖: 错误!`;
+        if (desc == `🔴免费抽奖: 免费次数用完了`) {
+            desc = `🟢免费抽奖: 免费次数用完了`;
+        }
+        if (desc == `❌免费抽奖: 错误!`) {
+            $.log(resp.body);
+        }
+        $.log(desc);
+        notifyMsg.push(desc);
+    });
+}
+
+async function loterry_video(ID) {
+  const [loginUid, loginSid] = ID.split('@');
+    let options = {
+        url: `https://integralapi.kuwo.cn/api/v1/online/sign/loterry/getLucky?loginUid=${loginUid}&loginSid=${loginSid}&type=video`,
+        headers: kw_headers,
+    };
+
+    return $.http.get(options).then((resp) => {
+        $.log("🟡正在执行视频抽奖任务...");
+        // $.log(resp.body);
+        var desc;
+        var obj = JSON.parse(resp.body);
+        if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
+            desc = obj.data.loterryname ? `🎉视频抽奖: ${obj.data.loterryname}` : `❌视频抽奖: 错误!`;
+        } else desc = obj.msg ? `🔴视频抽奖: ${obj.msg}` : `❌视频抽奖: 错误!`;
+        if (desc == `🔴视频抽奖: 视频次数用完了`) {
+            desc = `🟢视频抽奖: 视频次数用完了`;
+        }
+        if (desc == `❌视频抽奖: 错误!`) {
+            $.log(resp.body);
+        }
+        $.log(desc);
+        notifyMsg.push(desc);
+    });
+}
+
+async function surprise(ID) {
+  const [loginUid, loginSid] = ID.split('@');
+    var rand = Math.random() < 0.3 ? 68 : Math.random() < 0.6 ? 69 : 70;
+
+    let options = {
+        url: `https://integralapi.kuwo.cn/api/v1/online/sign/v1/earningSignIn/newDoListen?loginUid=${loginUid}&loginSid=${loginSid}&from=surprise&goldNum=${rand}&surpriseType=`,
+        headers: kw_headers,
+    };
+
+    return $.http.get(options).then((resp) => {
+        $.log("🟡正在执行惊喜任务...");
+        // $.log(resp.body);
+        var desc;
+        var obj = JSON.parse(resp.body);
+        if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
+            desc = obj.data.description;
+            if (desc == "成功") desc = `🎉惊喜任务: ${desc}`;
+            else if (desc == "今天已完成任务") desc = `🟢惊喜任务: ${desc}`;
+            else if (desc == "用户未登录") desc = `🔴惊喜任务: ${desc}`;
+            else desc = `⚠️惊喜任务: ${desc}`;
+        } else {
+            desc = `❌惊喜任务: 错误!`;
+            $.log(resp.body);
+        }
+        $.log(desc);
+        notifyMsg.push(desc);
+    });
+}
+
+async function box(ID) {
+    // 定时宝箱,可以强制领取,但不推荐!
+    var times = [];
+    var hour = new Date().getUTCHours() + 8;
+
+    if (hour >= 0) {
+        times.push("00-08");
+    }
+    if (hour >= 8) {
+        times.push("08-10");
+    }
+    if (hour >= 10) {
+        times.push("10-12");
+    }
+    if (hour >= 12) {
+        times.push("12-14");
+    }
+    if (hour >= 14) {
+        times.push("14-16");
+    }
+    if (hour >= 16) {
+        times.push("16-18");
+    }
+    if (hour >= 18) {
+        times.push("18-20");
+    }
+    if (hour >= 20) {
+        times.push("20-24");
+    }
+
+    var len = times.length;
+
+    await box_new(ID, times[len - 1]);
+
+    for (var i = 0; i < len - 1; i++) {
+        // console.log(time[i]);
+        await box_old(ID,times[i]);
+    }
+}
+
+async function box_new(ID, time) {
+  const [loginUid, loginSid] = ID.split('@');
+    var rand = Math.random() < 0.3 ? 28 : Math.random() < 0.6 ? 29 : 30;
+    //console.log(`调试：${loginUid}....${loginSid}`)
+    let options = {
+        url: `https://integralapi.kuwo.cn/api/v1/online/sign/new/boxRenew?loginUid=${loginUid}&loginSid=${loginSid}&action=new&time=${time}&goldNum=${rand}`,
+        headers: kw_headers,
+    };
+
+    return $.http.get(options).then((resp) => {
+        $.log("🟡正在执行定时宝箱任务...");
+        // $.log(resp.body);
+        var desc;
+        var obj = JSON.parse(resp.body);
+        if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
+            desc = obj.data.description;
+            if (desc == "成功") desc = `🎉定时宝箱: ${desc}`;
+            else if (desc == "今天已完成任务") desc = `🟢定时宝箱: ${desc}`;
+            else if (desc == "用户未登录") desc = `🔴定时宝箱: ${desc}`;
+            else desc = `⚠️定时宝箱: ${desc}`;
+        } else {
+            desc = `❌定时宝箱: 错误!`;
+            $.log(resp.body);
+        }
+        $.log(desc);
+        notifyMsg.push(desc);
+    });
+}
+
+async function box_old(ID, time) {
+  const [loginUid, loginSid] = ID.split('@');
+    var rand = Math.random() < 0.3 ? 28 : Math.random() < 0.6 ? 29 : 30;
+//console.log(`调试：${loginUid}....${loginSid}`)
+    let options = {
+        url: `https://integralapi.kuwo.cn/api/v1/online/sign/new/boxRenew?loginUid=${loginUid}&loginSid=${loginSid}&action=old&time=${time}&goldNum=${rand}`,
+        headers: kw_headers,
+    };
+
+    return $.http.get(options).then((resp) => {
+        $.log("🟡正在执行补领宝箱任务...");
+        // $.log(resp.body);
+        var desc;
+        var obj = JSON.parse(resp.body);
+        if (obj.code == 200 && obj.msg == "success" && obj.success == true) {
+            desc = obj.data.description;
+            if (desc == "成功") desc = `🎉补领宝箱: ${desc}`;
+            else if (desc == "今天已完成任务") desc = `🟢补领宝箱: ${desc}`;
+            else if (desc == "用户未登录") desc = `🔴补领宝箱: ${desc}`;
+            else desc = `⚠️补领宝箱: ${desc}`;
+        } else {
+            desc = `❌补领宝箱: 错误!`;
+            $.log(resp.body);
+        }
+        $.log(desc);
+        notifyMsg.push(desc);
+    });
+}
+
 
 function Env(t, s) {
     class e {
