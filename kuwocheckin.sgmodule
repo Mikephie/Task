@@ -1,0 +1,14 @@
+#!name=G酷我音乐金币✅签到
+#!desc=G酷我音乐金币 - 模块
+#!author=🅜ⓘ🅚ⓔ🅟ⓗ🅘ⓔ
+#!category=✅签到
+#!icon=https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png
+
+[Script]
+kuwo.cookie = type=http-request, pattern=^https:\/\/www\.kuwo\.cn\/openapi\/v2\/pc\/popConfig\/getPopByType\?, script-path=https://raw.githubusercontent.com/General74110/Scripts/master/Quantumult%20X/Script/Task/kuwo_Cookies.js,timeout=60,script-update-interval=0
+
+G酷我音乐金币签到 = type=cron, cronexp="0 * * * *", script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kuwo.js,timeout=3000,script-update-interval=0
+酷我音乐刷时长签到 = type=cron, cronexp="30 6 * * *", script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kuwomusic.js,timeout=60,script-update-interval=0
+
+[MITM]
+hostname = %APPEND% integralapi.kuwo.cn, appi.kuwo.cn, www.kuwo.cn
