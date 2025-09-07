@@ -1,5 +1,5 @@
 #!name=Get Cookies
-#!desc=酷我音乐、QQ阅读、喜马拉雅、万达智慧商业、GLaDOS。用于获取相关Cookie，成功后关闭模块以避免无意义的MitM。（具体获取Cookie方法自行查看脚本内容）
+#!desc=酷我音乐、QQ阅读、用于获取相关Cookie，成功后关闭模块以避免无意义的MitM
 #!author=🅜ⓘ🅚ⓔ🅟ⓗ🅘ⓔ
 #!category=✅签到
 
@@ -8,7 +8,7 @@
 酷我音乐(积分|时长)获取Cookie = type=http-request, pattern=^https?:\/\/appi\.kuwo\.cn\/(api\/automobile\/kuwo\/v1\/configuration\/signature|openapi\/v1\/www\/search\/searchKey), script-path=https://github.com/Mikephie/Task/blob/main/kuwo_Cookies.js, timeout=60
 
 # QQ阅读 - *.reader.qq.com
-QQ阅读获取Cookie = type=http-request, pattern=^https?:\/\/iostgw\.reader\.qq\.com\/v7_6_6\/userinfo\?, script-path=hhttps://github.com/Mikephie/Task/blob/main/QQreader.js, timeout=60
+QQ阅读获取Cookie = type=http-request, pattern=^https?:\/\/iostgw\.reader\.qq\.com\/v7_6_6\/userinfo\?, script-path=https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/QQreader.js, timeout=60
 
 [MITM]
 hostname = %APPEND% *.reader.qq.com, *.kuwo.cn, *.ximalaya.com
