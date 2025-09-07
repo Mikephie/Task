@@ -1,0 +1,15 @@
+#!name=签到合集CK
+#!desc=每日签到
+#!author=🅜ⓘ🅚ⓔ🅟ⓗ🅘ⓔ
+#!icon=https://github.com/Toperlock/Quantumult/raw/main/icon/Doraemon/Doraemon-1083.png
+#!tag=✅签到
+
+[Script]
+# 新币汇率监控
+cron "0 8,9 * * ?" script-path=https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/hljk.js, timeout=120, tag=汇率监控
+
+# 🎵酷我音乐金币签到
+cron "0 * * * *" script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kuwo.js, timeout=3000, tag=🎵G酷我音乐金币签到
+
+#QQ阅读
+cron "30 7 * * *" script-path=https://raw.githubusercontent.com/Mikephie/Task/main/QQreader.js, timeout=3000, tag=QQ阅读
