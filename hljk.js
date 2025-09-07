@@ -2,7 +2,6 @@
  * 监控汇率变化
  * @author: Peng-YM
  * @Alter: chxm1023
- * 更新地址：https://raw.githubusercontent.com/chxm1023/Task/main/hljk.js
  * 配置方法：
  * 1. 设置基准货币，默认人民币(CNY)。
  * 2. 设置保留几位小数。
