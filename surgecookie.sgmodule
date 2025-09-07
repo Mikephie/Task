@@ -3,10 +3,6 @@
 #!author=🅜ⓘ🅚ⓔ🅟ⓗ🅘ⓔ
 #!category=✅签到
 
-[Rule]
-DOMAIN,gslbali.ximalaya.com,REJECT
-DOMAIN,gslbtx.ximalaya.com,REJECT
-
 [Script]
 # 酷我音乐(积分|时长) - *.kuwo.cn
 酷我音乐(积分|时长)获取Cookie = type=http-request, pattern=^https?:\/\/appi\.kuwo\.cn\/(api\/automobile\/kuwo\/v1\/configuration\/signature|openapi\/v1\/www\/search\/searchKey), script-path=https://github.com/Mikephie/Task/blob/main/kuwo_Cookies.js, timeout=60
