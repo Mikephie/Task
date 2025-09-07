@@ -9,7 +9,7 @@
  * @update ：YangZhaocool
 
 [task_local]
-0 8,9 * * ? https://raw.githubusercontent.com/Mikephie/Task/main/hljk.js, tag=汇率监控, img-url=https://raw.githubusercontent.com/chxm1023/Task/main/icon/hljk.png, enabled=true
+8 * * * ? https://raw.githubusercontent.com/Mikephie/Task/main/hljk.js, tag=汇率监控, img-url=https://raw.githubusercontent.com/chxm1023/Task/main/icon/hljk.png, enabled=true
 
 ****************************************/
 
@@ -28,7 +28,7 @@ const currencyNames = {
     JPY: ["日元", "🇯🇵"],
     KRW: ["韩元", "🇰🇷"],
     THB: ["泰铢", "🇹🇭"],
-    VND: ["越南盾", "🇻🇳"],
+    NGN: ["奈拉", "🇳🇬"],
     TRY: ["土耳其里拉", "🇹🇷"],
     INR: ["印度卢比", "🇮🇳"],
 };
