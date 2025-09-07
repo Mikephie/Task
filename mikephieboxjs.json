@@ -1,0 +1,168 @@
+{
+  "id": "Mikephie",
+  "name": "Mikephie 脚本订阅",
+  "author": "@Mikephie",
+  "icon": "https://raw.githubusercontent.com/Mikephie/icons/main/icon/mikephie.png",
+  "repo": "https://github.com/Mikephie",
+  "apps": [
+    {
+      "id": "KuwoGold",
+      "name": "酷我金币",
+      "keys": ["ID"],
+      "settings": [
+        {
+          "id": "ID",
+          "name": "账号配置",
+          "val": "",
+          "type": "textarea",
+          "desc": "填入 loginUid@loginSid 格式的账号信息，多账号以英文逗号分隔"
+        },
+        {
+          "id": "tz",
+          "name": "通知开关",
+          "val": "1",
+          "type": "radios",
+          "desc": "默认开启通知，可根据需要关闭",
+          "items": [
+            {
+              "key": "0",
+              "label": "关闭通知"
+            },
+            {
+              "key": "1",
+              "label": "开启通知"
+            }
+          ]
+        },
+        {
+          "id": "autoConvert",
+          "name": "自动兑换设置",
+          "val": "1",
+          "type": "radios",
+          "desc": "积分达到15万时是否自动兑换会员",
+          "items": [
+            {
+              "key": "0",
+              "label": "关闭自动兑换"
+            },
+            {
+              "key": "1",
+              "label": "开启自动兑换"
+            }
+          ]
+        }
+      ],
+      "author": "@Mike",
+      "repo": "https://github.com/mike/scripts",
+      "icons": [
+        "https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png",
+        "https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png"
+      ],
+      "script": "https://raw.githubusercontent.com/Mikephie/Task/main/kuwogold.js"
+    },
+    {
+      "id": "KuwoTimes",
+      "name": "酷我时长",
+      "keys": [
+        "Clear",
+        "loginUid"
+      ],
+      "desc": "",
+      "settings": [
+        {
+          "id": "Clear",
+          "name": "清除Cookies",
+          "val": "0",
+          "type": "number",
+          "placeholder": "0为关闭,1为开启",
+          "desc": "清除所有酷我音乐Cookies"
+        },
+        {
+          "id": "loginUid",
+          "name": "登陆UID",
+          "val": "",
+          "type": "text",
+          "placeholder": "输入多个账号UID，用&隔开",
+          "desc": "抓取的loginUid，多个UID用&隔开"
+        }
+      ],
+      "author": "@Mikephie℡",
+      "repo": "https://github.com/Mikephie",
+      "icons": [
+        "https://raw.githubusercontent.com/General74110/Scripts/master/img/kuwo.png",
+        "https://raw.githubusercontent.com/General74110/Scripts/master/img/kuwo.png"
+      ],
+      "script": "https://raw.githubusercontent.com/Mikephie/Task/main/kuwotimes.js"
+    },
+    {
+      "id": "QQreader",
+      "name": "QQ阅读",
+      "keys": ["ywguid", "ywkey", "ywtoken", "csigs"],
+      "desc": "自动完成QQ阅读任务",
+      "settings": [
+        {
+          "id": "ywguid",
+          "name": "ywguid",
+          "val": "",
+          "type": "text",
+          "placeholder": "",
+          "desc": ""
+        },
+        {
+          "id": "ywkey",
+          "name": "ywkey",
+          "val": "",
+          "type": "text",
+          "placeholder": "",
+          "desc": ""
+        },
+        {
+          "id": "ywtoken",
+          "name": "ywtoken",
+          "val": "",
+          "type": "text",
+          "placeholder": "",
+          "desc": ""
+        },
+        {
+          "id": "csigs",
+          "name": "csigs",
+          "val": "",
+          "type": "text",
+          "placeholder": "",
+          "desc": ""
+        }
+      ],
+      "script": "https://raw.githubusercontent.com/Mikephie/Task/main/QQreader.js",
+      "icons": [
+        "https://raw.githubusercontent.com/General74110/Scripts/master/img/qqreader.png",
+        "https://raw.githubusercontent.com/General74110/Scripts/master/img/qqreader.png"
+      ]
+    },
+    {
+      "id": "Auto_join_TF",
+      "name": "TestFlight监控",
+      "author": "@Mikephie",
+      "script": "https://raw.githubusercontent.com/Mikephie/Script/main/qx/autojoinTF.js",
+      "icons": ["https://raw.githubusercontent.com/githubdulong/Script/master/Images/testflight.png"],
+      "keys": [
+        "session_id",
+        "session_digest",
+        "request_id",
+        "key",
+        "APP_ID"
+      ],
+      "settings": [
+        {
+          "id": "APP_ID",
+          "name": "填写APP_ID或点击TF链接自动捕获",
+          "val": "",
+          "type": "textarea",
+          "autoGrow": true,
+          "rows": 1,
+          "desc": "填写APP_ID 多个用英文逗号隔开(勿加空格)示例：iSTXKF4K,INmLTx8d"
+        }
+      ]
+    }
+  ]
+}
