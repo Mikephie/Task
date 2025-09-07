@@ -6,68 +6,10 @@
   "repo": "https://github.com/Mikephie",
   "apps": [
     {
-      "id": "KuwoGold",
-      "name": "酷我金币",
-      "keys": ["ID"],
-      "settings": [
-        {
-          "id": "ID",
-          "name": "账号配置",
-          "val": "",
-          "type": "textarea",
-          "desc": "填入 loginUid@loginSid 格式的账号信息，多账号以英文逗号分隔"
-        },
-        {
-          "id": "tz",
-          "name": "通知开关",
-          "val": "1",
-          "type": "radios",
-          "desc": "默认开启通知，可根据需要关闭",
-          "items": [
-            {
-              "key": "0",
-              "label": "关闭通知"
-            },
-            {
-              "key": "1",
-              "label": "开启通知"
-            }
-          ]
-        },
-        {
-          "id": "autoConvert",
-          "name": "自动兑换设置",
-          "val": "1",
-          "type": "radios",
-          "desc": "积分达到15万时是否自动兑换会员",
-          "items": [
-            {
-              "key": "0",
-              "label": "关闭自动兑换"
-            },
-            {
-              "key": "1",
-              "label": "开启自动兑换"
-            }
-          ]
-        }
-      ],
-      "author": "@Mike",
-      "repo": "https://github.com/mike/scripts",
-      "icons": [
-        "https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png",
-        "https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png"
-      ],
-      "script": "https://raw.githubusercontent.com/Mikephie/Task/main/kuwogold.js"
-    },
-    {
-      "id": "KuwoTimes",
-      "name": "酷我时长",
-      "keys": [
-        "Clear",
-        "loginUid"
-      ],
-      "desc": "",
+      "id": "KuwoMusic",
+      "name": "酷我音乐（时长+积分）",
+      "keys": ["Clear", "Kuwo_cookies"],
+      "desc": "支持多账号，请用 & 或 , 分隔多个 UID 和 SID 组",
       "settings": [
         {
           "id": "Clear",
@@ -75,24 +17,31 @@
           "val": "0",
           "type": "number",
           "placeholder": "0为关闭,1为开启",
-          "desc": "清除所有酷我音乐Cookies"
+          "desc": "清除酷我音乐Cookies（时长+积分）"
         },
         {
-          "id": "loginUid",
-          "name": "登陆UID",
+          "id": "Kuwo_cookies",
+          "name": "登录 UID (时长) / UID@SID (积分)",
           "val": "",
           "type": "text",
-          "placeholder": "输入多个账号UID，用&隔开",
-          "desc": "抓取的loginUid，多个UID用&隔开"
+          "placeholder": "loginUid 或 loginUid@loginSid（多个用 & 或 , 分隔）",
+          "desc": "时长模式: 仅填 loginUid\n积分模式: 填 loginUid@loginSid\n多个账户请用 & 分隔"
         }
       ],
-      "author": "@Mikephie℡",
-      "repo": "https://github.com/Mikephie",
+      "scripts": [
+        {
+          "name": "酷我音乐（时长）",
+          "script": "https://raw.githubusercontent.com/Mikephie/Task/main/kuwomusic.js"
+        },
+        {
+          "name": "酷我音乐（积分）",
+          "script": "https://raw.githubusercontent.com/Mikephie/Task/main/kuwo.js"
+        }
+      ],
       "icons": [
         "https://raw.githubusercontent.com/General74110/Scripts/master/img/kuwo.png",
         "https://raw.githubusercontent.com/General74110/Scripts/master/img/kuwo.png"
-      ],
-      "script": "https://raw.githubusercontent.com/Mikephie/Task/main/kuwotimes.js"
+      ]
     },
     {
       "id": "QQreader",
