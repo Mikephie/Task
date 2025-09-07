@@ -1,4 +1,0 @@
-[Script]
-
-# test
-TF会话切换 = type=cron,cronexp=0/5 * * * * *,script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/box/switcher/box.switcher.js,timeout=120,wake-system=1
