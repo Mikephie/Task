@@ -89,6 +89,44 @@
       ]
     },
     {
+      "id": "WuAi",
+      "name": "吾爱破解",
+      "descs_html": [
+        "<a style='color:#686de0;display:block;text-align:center;' target='_blank' href='https://raw.githubusercontent.com/Yuheng0101/X/main/Tasks/52pojie.js'>脚本链接</a>"
+      ],
+      "keys": ["wuai_debug", "wuai_cookie", "wuai_bark_key"],
+      "settings": [
+        {
+          "id": "wuai_debug",
+          "name": "是否开启调试模式",
+          "val": false,
+          "type": "boolean",
+          "desc": ""
+        },
+        {
+          "id": "wuai_cookie",
+          "name": "Cookie",
+          "val": null,
+          "type": "textarea",
+          "rows": 5,
+          "desc": ""
+        },
+        {
+          "id": "wuai_bark_key",
+          "name": "Bark密钥",
+          "val": null,
+          "type": "text",
+          "desc": "填写后只使用Bark推送"
+        }
+      ],
+      "author": "@Mikephie",
+      "icons": [
+        "https://raw.githubusercontent.com/Yuheng0101/X/main/Assets/52pojie.png",
+        "https://raw.githubusercontent.com/Yuheng0101/X/main/Assets/52pojie.png"
+      ],
+      "script": "https://raw.githubusercontent.com/Mikephie/Task/main/52pojie.js"
+    },
+    {
       "id": "Auto_join_TF",
       "name": "TestFlight监控",
       "author": "@Mikephie",
