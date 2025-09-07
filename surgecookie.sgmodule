@@ -1,38 +1,18 @@
-#!name=Cookie获取-MK
-#!desc=该模块适用于定时签到脚本的Cookie获取. 集成: BiliBili, 喜马拉雅, NGA, 腾讯视频, 贴吧, TestFlight, 酷我音乐, 阿里云盘; 请在使用后手动将其禁用，以免产生不必要的MITM.
-#!system=ios
-#!category= 签到✅
+#!name=Get Cookies
+#!desc=酷我音乐、QQ阅读、喜马拉雅、万达智慧商业、GLaDOS。用于获取相关Cookie，成功后关闭模块以避免无意义的MitM。（具体获取Cookie方法自行查看脚本内容）
+#!author=🅜ⓘ🅚ⓔ🅟ⓗ🅘ⓔ
+#!category=✅签到
 
 [Rule]
 DOMAIN,gslbali.ximalaya.com,REJECT
 DOMAIN,gslbtx.ximalaya.com,REJECT
 
 [Script]
-B站Cookie(APP) = type=http-request,pattern=^https?:\/\/app\.bilibili\.com\/x\/resource\/fingerprint\?,script-path=https://raw.githubusercontent.com/ClydeTime/Surge/main/Script/Task/BiliBili.js,requires-body=0
+# 酷我音乐(积分|时长) - *.kuwo.cn
+酷我音乐(积分|时长)获取Cookie = type=http-request, pattern=^https?:\/\/appi\.kuwo\.cn\/(api\/automobile\/kuwo\/v1\/configuration\/signature|openapi\/v1\/www\/search\/searchKey), script-path=https://github.com/Mikephie/Task/blob/main/kuwo_Cookies.js, timeout=60
 
-B站Cookie(网页) = type=http-request,pattern=^https?:\/\/m.bilibili.com/$,script-path=https://raw.githubusercontent.com/ClydeTime/Surge/main/Script/Task/BiliBili.js,requires-body=0
-
-喜马拉雅Cookie = type=http-request,pattern=^https?:\/\/xmc\.ximalaya\.com\/xmlymain-login-web\/login\/,script-path=https://raw.githubusercontent.com/ClydeTime/Surge/main/Script/Task/xmly.js,requires-body=0
-
-NGA玩家社区Cookie = type=http-request,pattern=^https?:\/\/ngabbs.com\/nuke.php$,script-path=https://raw.githubusercontent.com/ClydeTime/Surge/main/Script/Task/nga.js,requires-body=1
-
-腾讯视频Cookie = type=http-request,pattern=^https?:\/\/iacc\.rec\.qq\.com,script-path=https://raw.githubusercontent.com/ClydeTime/Surge/main/Script/Task/videoqq.js,requires-body=0
-
-贴吧Cookie1 = type=http-request,pattern=^https?:\/\/tiebac\.baidu\.com\/c\/u\/follow\/getFoldedMessageUserInfo,script-path=https://raw.githubusercontent.com/ClydeTime/Surge/main/Script/Task/TieBa.js,requires-body=0
-
-贴吧Cookie2 = type=http-request,pattern=^https?:\/\/c\.tieba\.baidu\.com\/c\/u\/follow\/getFoldedMessageUserInfo,script-path=https://raw.githubusercontent.com/ClydeTime/Surge/main/Script/Task/TieBa.js,requires-body=0
-
-TestFlight Cookie = type=http-request, pattern=^https:\/\/testflight\.apple\.com\/v3\/accounts\/.*\/ru\/([^\/]+)(?!\/accept)$, script-path=https://raw.githubusercontent.com/MCdasheng/QuantumultX/main/Scripts/myScripts/TF_appIds.js, requires-body=true, max-size=-1, timeout=60
-
-酷我音乐Cookie - MCdasheng = type=http-request, pattern=^https\:\/\/integralapi\.kuwo\.cn\/api\/v1\/online\/sign\/v1\/earningSignIn\/.*, script-path=https://raw.githubusercontent.com/MCdasheng/QuantumultX/main/Scripts/myScripts/kuwo.cookie.js, requires-body=true, max-size=-1, timeout=60
-
-酷我音乐Cookie = type=http-request, pattern=^https:\/\/appi\.kuwo\.cn\/api\/automobile\/kuwo\/v1\/configuration\/signature\?)/, script-path=https://raw.githubusercontent.com/General74110/Quantumult-X/master/Task/kuwo_Cookies.js, requires-body=true, max-size=-1, timeout=60
-
-酷我音乐刷时长获取Cookie = type=http-request, pattern=^https:\/\/integralapi\.kuwo\.cn\/api\/v1\/online\/sign\/v1\/music\/userBase\?, script-path=https://raw.githubusercontent.com/General74110/Quantumult-X/master/Task/Kuwomusic.js, requires-body=true, timeout=60
-
-酷狗概念版数据Cookie = type=http-request,pattern=https://gateway.kugou.com/youth/v1/(recharge/receive_vip_listen_song|activity/get_month_vip_record).*,requires-body=0,script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kugou.js, requires-body=true, timeout=60
-
-阿里云盘Token = type=http-request, pattern=^https:\/\/(auth|aliyundrive)\.alipan\.com\/v2\/account\/token, script-path=https://gist.githubusercontent.com/Sliverkiss/33800a98dcd029ba09f8b6fc6f0f5162/raw/aliyun.js, requires-body=true, max-size=-1, timeout=60
+# QQ阅读 - *.reader.qq.com
+QQ阅读获取Cookie = type=http-request, pattern=^https?:\/\/iostgw\.reader\.qq\.com\/v7_6_6\/userinfo\?, script-path=hhttps://github.com/Mikephie/Task/blob/main/QQreader.js, timeout=60
 
 [MITM]
-hostname = %APPEND% app.bilibili.com, m.bilibili.com, xmc.ximalaya.com, ngabbs.com, iacc.rec.qq.com, c.tieba.baidu.com, tiebac.baidu.com, integralapi.kuwo.cn, appi.kuwo.cn, testflight.apple.com, dache.amap.com, auth.alipan.com, auth.aliyundrive.com
+hostname = %APPEND% *.reader.qq.com, *.kuwo.cn, *.ximalaya.com
