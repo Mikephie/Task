@@ -2,83 +2,74 @@
  * 监控汇率变化
  * @author: Peng-YM
  * @Alter: chxm1023
- * 配置方法：
- * 1. 设置基准货币，默认人民币(CNY)。
- * 2. 设置保留几位小数。
+ * 更新地址：https://raw.githubusercontent.com/chxm1023/Task/main/hljk.js
  * @update ：YangZhaocool
-
-[task_local]
-8 * * * ? https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/hljk.js, tag=汇率监控, img-url=https://raw.githubusercontent.com/chxm1023/Task/main/icon/hljk.png, enabled=true
-
 ****************************************/
 
-const base = "SGD"; // 基准货币，可以改成其他币种
-const digits = 3; // 保留几位有效数字
+const base   = "SGD"; // ← 改这里：基准货币，例如 NGN(奈拉) / SGD / USD / CNY ...
+const digits = 3;     // 保留几位有效数字
 
 const $ = API("exchange");
+
+// 显示用的名称与旗帜（需要哪个就写哪个，代码用三字母）
 const currencyNames = {
-    SGD: ["新加坡币", "🇸🇬"],
-    MYR: ["马来西亚林吉特", "🇲🇾"],
-    USD: ["美元", "🇺🇸"],
-    EUR: ["欧元", "🇪🇺"],
-    GBP: ["英镑", "🇬🇧"],
-    CNY: ["人民币", "🇨🇳"],
-    HKD: ["港币", "🇭🇰"],
-    JPY: ["日元", "🇯🇵"],
-    KRW: ["韩元", "🇰🇷"],
-    NGN: ["奈拉", "🇳🇬"],
-    TRY: ["土耳其里拉", "🇹🇷"],
-    INR: ["印度卢比", "🇮🇳"],
+  SGD: ["新加坡币", "🇸🇬"],
+  MYR: ["马来西亚林吉特", "🇲🇾"],
+  USD: ["美元", "🇺🇸"],
+  EUR: ["欧元", "🇪🇺"],
+  GBP: ["英镑", "🇬🇧"],
+  CNY: ["人民币", "🇨🇳"],
+  HKD: ["港币", "🇭🇰"],
+  JPY: ["日元", "🇯🇵"],
+  KRW: ["韩元", "🇰🇷"],
+  THB: ["泰铢", "🇹🇭"],
+  NGN: ["奈拉", "🇳🇬"],   // ← 奈拉（尼日利亚）
+  TRY: ["土耳其里拉", "🇹🇷"],
+  INR: ["印度卢比", "🇮🇳"],
+  // 如需越南盾可加：VND: ["越南盾", "🇻🇳"],
 };
 
+// ---- 关键修正：用 base 变量拼接请求 ---- //
+$.http.get({ url: `https://api.exchangerate-api.com/v4/latest/${base}` })
+  .then((response) => {
+    const data = JSON.parse(response.body);
+    const source = currencyNames[base] || [base, ""];
 
-$.http.get({
-    url: "https://api.exchangerate-api.com/v4/latest/SGD"
-})
-    .then((response) => {
-        const data = JSON.parse(response.body);
-        const source = currencyNames[base];
+    const info = Object.keys(currencyNames).reduce((acc, key) => {
+      if (key === base) return acc;
+      if (!data.rates || !data.rates.hasOwnProperty(key)) return acc;
 
-        const info = Object.keys(currencyNames).reduce((accumulator, key) => {
-            let line = "";
-            if (key !== base && data.rates.hasOwnProperty(key)) {
-                const rate = parseFloat(data.rates[key]);
-                const target = currencyNames[key];
-                if (rate > 1) {
-                    line = `${target[1]} 1${source[0]}兑${roundNumber(rate, digits)}${
-                        target[0]
-                    }\n`;
-                } else {
-                    line = `${target[1]} 1${target[0]}兑${roundNumber(1 / rate, digits)}${
-                        source[0]
-                    }\n`;
-                }
-            }
-            return accumulator + line;
-        }, "");
-        $.notify(
-            `[今日汇率] 基准：${source[1]} ${source[0]}`,
-            `⏰ 更新时间：${data.date}`,
-            `📈 汇率情况：\n${info}`
-        );
-    })
-    .then(() => $.done());
+      const rate = parseFloat(data.rates[key]); // 1 base → ? target
+      const target = currencyNames[key] || [key, ""];
+      let line = "";
+
+      // 统一口径：展示"1基准币 = ? 目标币"
+      line = `${target[1]} 1${source[0]}兑${roundNumber(rate, digits)}${target[0]}\n`;
+
+      return acc + line;
+    }, "");
+
+    $.notify(
+      `[今日汇率] 基准：${source[1]} ${source[0]} (${base})`,
+      `⏰ 更新时间：${data.date}`,
+      `📈 汇率情况：\n${info}`
+    );
+  })
+  .then(() => $.done());
 
 function roundNumber(num, scale) {
-    if (!("" + num).includes("e")) {
-        return +(Math.round(num + "e+" + scale) + "e-" + scale);
-    } else {
-        let arr = ("" + num).split("e");
-        let sig = "";
-        if (+arr[1] + scale > 0) {
-            sig = "+";
-        }
-        return +(
-            Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) +
-            "e-" +
-            scale
-        );
-    }
+  if (!("" + num).includes("e")) {
+    return +(Math.round(num + "e+" + scale) + "e-" + scale);
+  } else {
+    let arr = ("" + num).split("e");
+    let sig = "";
+    if (+arr[1] + scale > 0) sig = "+";
+    return +(
+      Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) +
+      "e-" +
+      scale
+    );
+  }
 }
 
 // prettier-ignore
