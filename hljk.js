@@ -1,14 +1,20 @@
 /****************************************
- * 今日汇率（对齐版 + 涨跌箭头）
- * - 两字币种用全角空格补齐
+ * 今日汇率（彩色箭头版）
+ * - 两字币种用全角空格补齐（如"美　元"）
  * - 数字补齐到固定小数位（顶格）
- * - 与上次运行快照对比显示 ↑/↓/→ + 百分比
+ * - 箭头在数字前，升🟢↑ / 降🔴↓ / 平⚪→
+ * - 与上次运行快照对比显示涨跌百分比
  ****************************************/
 
 const base          = "SGD"; // 基准货币
 const digits        = 3;     // 数字小数位
 const trendDigits   = 2;     // 涨跌百分比小数位
 const SNAP_KEY_BASE = "EX_RATES_SNAPSHOT_"; // 快照前缀（按基准币区分）
+
+// 彩色符号（可自行替换为 🟩/🟥、📈/📉 等）
+const SYM_UP   = "🟢↑";
+const SYM_DOWN = "🔴↓";
+const SYM_FLAT = "⚪→";
 
 const $ = API("exchange");
 
@@ -27,36 +33,30 @@ const currencyNames = {
   THB: ["泰铢", "🇹🇭"],
 };
 
-// 展示顺序（只显示这些；奈拉在泰铢上面）
+// 展示顺序（奈拉在泰铢上面；其余不显示）
 const ORDER = ["MYR","USD","EUR","GBP","CNY","HKD","JPY","KRW","NGN","THB"];
 
 /* ---------- 工具 ---------- */
 // 两字 → 中间插入"全角空格 U+3000"；三字原样
-function padName(name) {
-  return name.length === 2 ? name[0] + "　" + name[1] : name;
-}
+function padName(name) { return name.length === 2 ? name[0] + "　" + name[1] : name; }
 // 固定小数位
 function fix(num, n = digits) { return Number(num).toFixed(n); }
-// 涨跌标记
+// 涨跌标记（返回 [符号, 百分比字符串]）
 function trendTag(curr, prev) {
-  if (typeof prev !== "number" || !isFinite(prev) || prev <= 0) return " (--)";
+  if (typeof prev !== "number" || !isFinite(prev) || prev <= 0) return [SYM_FLAT, "(--)"];
   const diff = curr - prev;
-  if (Math.abs(diff) < 1e-12) return " (→0%)";
-  const pct = Math.abs((diff / prev) * 100);
-  return diff > 0 ? ` (↑${pct.toFixed(trendDigits)}%)`
-       : diff < 0 ? ` (↓${pct.toFixed(trendDigits)}%)`
-                  : " (→0%)";
+  if (Math.abs(diff) < 1e-12) return [SYM_FLAT, "(0%)"];
+  const pct = Math.abs((diff / prev) * 100).toFixed(trendDigits);
+  return diff > 0 ? [SYM_UP,   `(${pct}%)`]
+       : diff < 0 ? [SYM_DOWN, `(${pct}%)`]
+                  : [SYM_FLAT, "(0%)"];
 }
 // 快照读写（按 base 隔离）
-function readSnap() {
-  try { return JSON.parse($.read(SNAP_KEY_BASE + base) || "{}"); } catch { return {}; }
-}
-function writeSnap(obj) {
-  try { $.write(JSON.stringify(obj), SNAP_KEY_BASE + base); } catch {}
-}
+function readSnap() { try { return JSON.parse($.read(SNAP_KEY_BASE + base) || "{}"); } catch { return {}; } }
+function writeSnap(obj){ try { $.write(JSON.stringify(obj), SNAP_KEY_BASE + base); } catch {} }
 
-// 主数据源（免 Key）
-async function getRates(baseCode) {
+// 免 Key 数据源
+async function getRates(baseCode){
   const resp = await $.http.get({ url: `https://api.exchangerate-api.com/v4/latest/${baseCode}` });
   const data = JSON.parse(resp.body || "{}");
   return { date: data.date, rates: data.rates || {} };
@@ -72,13 +72,14 @@ async function getRates(baseCode) {
 
     const lines = ORDER.reduce((acc, code) => {
       const meta = currencyNames[code]; if (!meta) return acc;
-      const r = rates[code];
-      if (!(r > 0)) return acc;
+      const r = rates[code]; if (!(r > 0)) return acc;
 
       const name = padName(meta[0]);
       const num  = fix(r, digits);
-      const tag  = trendTag(r, snap.rates ? snap.rates[code] : undefined);
-      return acc + `${meta[1]} ${name}：1${src[0]}兑 ${num}${tag}\n`;
+      const [sym, pct] = trendTag(r, snap.rates ? snap.rates[code] : undefined);
+
+      // 箭头放在数字前
+      return acc + `${meta[1]} ${name}：1${src[0]}兑 ${sym}${num} ${pct}\n`;
     }, "");
 
     $.notify(
@@ -87,7 +88,7 @@ async function getRates(baseCode) {
       `📈 汇率情况：\n${lines}`
     );
 
-    // 写入快照（只保存用到的币种，体积更小）
+    // 保存快照（只存展示的币种）
     const newSnap = { date: date || "--", rates: {} };
     for (const code of ORDER) if (typeof rates[code] === "number") newSnap.rates[code] = rates[code];
     writeSnap(newSnap);
