@@ -1,17 +1,12 @@
 /****************************************
- * 监控汇率变化（多源版：CurrencyFreaks → FastForex → exchangerate.host）
- * 原作者: Peng-YM | Alter: chxm1023 | update: YangZhaocool
- * 加强: 多源兜底，确保 NGN（奈拉）尽量可用
+ * 监控汇率变化（含 NGN 兜底）
+ * 原作者: Peng-YM  | Alter: chxm1023 | update: YangZhaocool
  ****************************************/
 
 const base   = "SGD"; // 基准货币：SGD / USD / CNY / NGN ...
 const digits = 3;     // 小数位
 
 const $ = API("exchange");
-
-// 从持久化读取 API Key（可选）
-const CF_KEY  = $.read("EX_API_CF_KEY") || "";          // CurrencyFreaks key
-const FF_KEY  = $.read("EX_API_FASTFOREX_KEY") || "";   // FastForex key
 
 // 展示名称与旗帜
 const currencyNames = {
@@ -34,7 +29,7 @@ const currencyNames = {
 // 自定义展示顺序（未列出的会追加在后面）
 const ORDER = ["MYR","USD","EUR","GBP","CNY","HKD","JPY","KRW","THB","VND","TRY","INR","NGN"];
 
-/* ========== 工具 ========== */
+// ---------- 工具 ----------
 function roundNumber(num, scale) {
   if (!("" + num).includes("e")) {
     return +(Math.round(num + "e+" + scale) + "e-" + scale);
@@ -46,92 +41,38 @@ function roundNumber(num, scale) {
   }
 }
 
-// 把 rates 统一换算成 "1 desiredBase -> ? target"
-// 输入：ratesMap 是 "1 responseBase -> ? target"
-function normalizeRates(ratesMap, responseBase, desiredBase) {
-  const out = {};
-  if (!ratesMap) return out;
-  if (responseBase === desiredBase) return { ...ratesMap };
-  // 需要 cross conversion： r(desired->target) = r(resp->target) / r(resp->desired)
-  const rDesired = ratesMap[desiredBase];
-  if (!rDesired || rDesired <= 0) return out; // 无法换算
-  for (const [k, v] of Object.entries(ratesMap)) {
-    if (k === desiredBase) continue;
-    if (v > 0) out[k] = v / rDesired;
-  }
-  return out;
-}
-
-/* ========== 三个数据源 ========== */
-// 1) CurrencyFreaks（推荐，支持 NGN）
-async function getRatesFromCurrencyFreaks(baseCode, symbols) {
-  if (!CF_KEY) return { date: "", rates: {}, base: "" };
-  const url = `https://api.currencyfreaks.com/latest?apikey=${encodeURIComponent(CF_KEY)}&base=${encodeURIComponent(baseCode)}&symbols=${encodeURIComponent(symbols.join(","))}`;
-  const resp = await $.http.get({ url });
+async function getPrimaryRates(baseCode) {
+  const resp = await $.http.get({ url: `https://api.exchangerate-api.com/v4/latest/${baseCode}` });
   const data = JSON.parse(resp.body || "{}");
-  // 某些套餐可能强制 base=USD，这里统一做归一化
-  const responseBase = data.base || baseCode;
-  const norm = normalizeRates(data.rates || {}, responseBase, baseCode);
-  return { date: (data.date || ""), rates: norm, base: baseCode };
+  return { date: data.date, rates: data.rates || {} };
 }
 
-// 2) FastForex
-async function getRatesFromFastForex(baseCode, symbols) {
-  if (!FF_KEY) return { date: "", rates: {}, base: "" };
-  // fetch-multi: https://api.fastforex.io/fetch-multi?from=SGD&to=USD,EUR,NGN&api_key=...
-  const url = `https://api.fastforex.io/fetch-multi?from=${encodeURIComponent(baseCode)}&to=${encodeURIComponent(symbols.join(","))}&api_key=${encodeURIComponent(FF_KEY)}`;
-  const resp = await $.http.get({ url });
+// 兜底：只补缺失的币（如 NGN），来源 exchangerate.host
+async function fillMissingWithHost(baseCode, missingCodes) {
+  if (!missingCodes.length) return {};
+  const symbols = missingCodes.join(",");
+  const resp = await $.http.get({
+    url: `https://api.exchangerate.host/latest?base=${encodeURIComponent(baseCode)}&symbols=${encodeURIComponent(symbols)}`
+  });
   const data = JSON.parse(resp.body || "{}");
-  // 返回形如 { updated:"2025-... ", base:"SGD", results:{USD:0.77, ...}}
-  const responseBase = data.base || baseCode;
-  let ratesMap = data.results || {};
-  // 如果 base 不等于我们期望，还是统一归一化（一般等于）
-  ratesMap[responseBase] = 1;
-  const norm = normalizeRates(ratesMap, responseBase, baseCode);
-  return { date: data.updated || "", rates: norm, base: baseCode };
+  return data.rates || {};
 }
 
-// 3) exchangerate.host（免 Key 兜底）
-async function getRatesFromHost(baseCode, symbols) {
-  const url = `https://api.exchangerate.host/latest?base=${encodeURIComponent(baseCode)}&symbols=${encodeURIComponent(symbols.join(","))}`;
-  const resp = await $.http.get({ url });
-  const data = JSON.parse(resp.body || "{}");
-  return { date: data.date || "", rates: data.rates || {}, base: baseCode };
-}
-
-/* ========== 主流程 ========== */
 (async () => {
   try {
     const source = currencyNames[base] || [base, ""];
-    const wanted = Object.keys(currencyNames).filter(k => k !== base);
+    const prim   = await getPrimaryRates(base);
+    const rates  = { ...prim.rates }; // 1 base -> ? target
 
-    // 为了能进行 cross conversion（极端情况下），把 base 也加进 symbols
-    const symbolsForQuery = Array.from(new Set([...wanted, base]));
+    const wanted  = Object.keys(currencyNames).filter(k => k !== base);
+    const missing = wanted.filter(k => !(k in rates));
 
-    // 依次尝试三家源
-    const layers = [];
-
-    // 主源：CurrencyFreaks
-    try { layers.push(await getRatesFromCurrencyFreaks(base, symbolsForQuery)); } catch (_) {}
-
-    // 兜底一：FastForex
-    try { layers.push(await getRatesFromFastForex(base, symbolsForQuery)); } catch (_) {}
-
-    // 兜底二：exchangerate.host
-    try { layers.push(await getRatesFromHost(base, symbolsForQuery)); } catch (_) {}
-
-    // 合并：前者优先，缺谁补谁
-    const merged = {};
-    let firstDate = "";
-    for (const layer of layers) {
-      if (!firstDate && layer.date) firstDate = layer.date;
-      const r = layer.rates || {};
-      for (const k of wanted) {
-        if (!(k in merged) && r[k] > 0) merged[k] = r[k];
-      }
+    // 用备用源补齐缺失（例如 NGN）
+    if (missing.length) {
+      const patched = await fillMissingWithHost(base, missing);
+      Object.assign(rates, patched);
     }
 
-    // 排序
     const orderSet = new Set(ORDER);
     const sorted = [
       ...ORDER.filter(k => k !== base && wanted.includes(k)),
@@ -140,9 +81,10 @@ async function getRatesFromHost(baseCode, symbols) {
 
     const info = sorted.reduce((acc, key) => {
       const target = currencyNames[key] || [key, ""];
-      const val = merged[key];
-      if (val > 0) {
-        return acc + `${target[1]} 1${source[0]}兑${roundNumber(val, digits)}${target[0]}\n`;
+      const r = rates[key];
+      if (r > 0) {
+        // 统一口径：1 基准币 = ? 目标币
+        return acc + `${target[1]} 1${source[0]}兑${roundNumber(r, digits)}${target[0]}\n`;
       } else {
         return acc + `${target[1]} ${target[0]}：暂无数据（源未提供）\n`;
       }
@@ -150,7 +92,7 @@ async function getRatesFromHost(baseCode, symbols) {
 
     $.notify(
       `[今日汇率] 基准：${source[1]} ${source[0]} (${base})`,
-      `⏰ 更新时间：${firstDate || "--"}`,
+      `⏰ 更新时间：${prim.date || "--"}`,
       `📈 汇率情况：\n${info}`
     );
   } catch (e) {
@@ -160,6 +102,7 @@ async function getRatesFromHost(baseCode, symbols) {
   }
 })();
 
+// prettier-ignore
 /*********************************** API *************************************/
 function ENV(){const e="undefined"!=typeof $task,t="undefined"!=typeof $loon,s="undefined"!=typeof $httpClient&&!t,i="function"==typeof require&&"undefined"!=typeof $jsbox;return{isQX:e,isLoon:t,isSurge:s,isNode:"function"==typeof require&&!i,isJSBox:i,isRequest:"undefined"!=typeof $request,isScriptable:"undefined"!=typeof importModule}}
 function HTTP(e={baseURL:""}){const{isQX:t,isLoon:s,isSurge:i,isScriptable:n,isNode:o}=ENV(),r=/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/;const u={};return["GET","POST","PUT","DELETE","HEAD","OPTIONS","PATCH"].forEach(l=>u[l.toLowerCase()]=(u=>(function(u,l){l="string"==typeof l?{url:l}:l;const h=e.baseURL;h&&!r.test(l.url||"")&&(l.url=h?h+l.url:l.url);const a=(l={...e,...l}).timeout,c={onRequest:()=>{},onResponse:e=>e,onTimeout:()=>{},...l.events};let f,d;if(c.onRequest(u,l),t)f=$task.fetch({method:u,...l});else if(s||i||o)f=new Promise((e,t)=>{(o?require("request"):$httpClient)[u.toLowerCase()](l,(s,i,n)=>{s?t(s):e({statusCode:i.status||i.statusCode,headers:i.headers,body:n})})});else if(n){const e=new Request(l.url);e.method=u,e.headers=l.headers,e.body=l.body,f=new Promise((t,s)=>{e.loadString().then(s=>{t({statusCode:e.response.statusCode,headers:e.response.headers,body:s})}).catch(e=>s(e))})}const p=a?new Promise((e,t)=>{d=setTimeout(()=>(c.onTimeout(),t(`${u} URL: ${l.url} exceeds the timeout ${a} ms`)),a)}):null;return(p?Promise.race([p,f]).then(e=>(clearTimeout(d),e)):f).then(e=>c.onResponse(e))})(l,u))),u}
