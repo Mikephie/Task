@@ -1,7 +1,6 @@
 /****************************************
- * 监控汇率变化（多源版：CurrencyFreaks → FastForex → exchangerate.host）
- * 原作者: Peng-YM | Alter: chxm1023 | update: YangZhaocool
- * 加强: 多源兜底，确保 NGN（奈拉）尽量可用
+ * 监控汇率变化（FastForex 主源版）
+ * 支持 NGN，直接写死 API Key
  ****************************************/
 
 const base   = "SGD"; // 基准货币：SGD / USD / CNY / NGN ...
@@ -9,9 +8,8 @@ const digits = 3;     // 小数位
 
 const $ = API("exchange");
 
-// 从持久化读取 API Key（可选）
-const CF_KEY  = $.read("EX_API_CF_KEY") || "";          // CurrencyFreaks key
-const FF_KEY  = $.read("EX_API_FASTFOREX_KEY") || "";   // FastForex key
+// 直接写入 FastForex API Key（建议改为持久化方式）
+const FF_KEY  = "643b9e20bf-7674eab83e-t29asq";
 
 // 展示名称与旗帜
 const currencyNames = {
@@ -28,13 +26,13 @@ const currencyNames = {
   VND: ["越南盾", "🇻🇳"],
   TRY: ["土耳其里拉", "🇹🇷"],
   INR: ["印度卢比", "🇮🇳"],
-  NGN: ["奈拉", "🇳🇬"],  // 重点：奈拉
+  NGN: ["奈拉", "🇳🇬"],  // 奈拉
 };
 
-// 自定义展示顺序（未列出的会追加在后面）
+// 自定义展示顺序
 const ORDER = ["MYR","USD","EUR","GBP","CNY","HKD","JPY","KRW","THB","VND","TRY","INR","NGN"];
 
-/* ========== 工具 ========== */
+/* ========== 工具函数 ========== */
 function roundNumber(num, scale) {
   if (!("" + num).includes("e")) {
     return +(Math.round(num + "e+" + scale) + "e-" + scale);
@@ -46,57 +44,16 @@ function roundNumber(num, scale) {
   }
 }
 
-// 把 rates 统一换算成 "1 desiredBase -> ? target"
-// 输入：ratesMap 是 "1 responseBase -> ? target"
-function normalizeRates(ratesMap, responseBase, desiredBase) {
-  const out = {};
-  if (!ratesMap) return out;
-  if (responseBase === desiredBase) return { ...ratesMap };
-  // 需要 cross conversion： r(desired->target) = r(resp->target) / r(resp->desired)
-  const rDesired = ratesMap[desiredBase];
-  if (!rDesired || rDesired <= 0) return out; // 无法换算
-  for (const [k, v] of Object.entries(ratesMap)) {
-    if (k === desiredBase) continue;
-    if (v > 0) out[k] = v / rDesired;
-  }
-  return out;
-}
-
-/* ========== 三个数据源 ========== */
-// 1) CurrencyFreaks（推荐，支持 NGN）
-async function getRatesFromCurrencyFreaks(baseCode, symbols) {
-  if (!CF_KEY) return { date: "", rates: {}, base: "" };
-  const url = `https://api.currencyfreaks.com/latest?apikey=${encodeURIComponent(CF_KEY)}&base=${encodeURIComponent(baseCode)}&symbols=${encodeURIComponent(symbols.join(","))}`;
-  const resp = await $.http.get({ url });
-  const data = JSON.parse(resp.body || "{}");
-  // 某些套餐可能强制 base=USD，这里统一做归一化
-  const responseBase = data.base || baseCode;
-  const norm = normalizeRates(data.rates || {}, responseBase, baseCode);
-  return { date: (data.date || ""), rates: norm, base: baseCode };
-}
-
-// 2) FastForex
+/* ========== FastForex 获取数据 ========== */
 async function getRatesFromFastForex(baseCode, symbols) {
-  if (!FF_KEY) return { date: "", rates: {}, base: "" };
-  // fetch-multi: https://api.fastforex.io/fetch-multi?from=SGD&to=USD,EUR,NGN&api_key=...
+  // https://api.fastforex.io/fetch-multi?from=SGD&to=USD,EUR,NGN&api_key=...
   const url = `https://api.fastforex.io/fetch-multi?from=${encodeURIComponent(baseCode)}&to=${encodeURIComponent(symbols.join(","))}&api_key=${encodeURIComponent(FF_KEY)}`;
   const resp = await $.http.get({ url });
   const data = JSON.parse(resp.body || "{}");
-  // 返回形如 { updated:"2025-... ", base:"SGD", results:{USD:0.77, ...}}
   const responseBase = data.base || baseCode;
   let ratesMap = data.results || {};
-  // 如果 base 不等于我们期望，还是统一归一化（一般等于）
   ratesMap[responseBase] = 1;
-  const norm = normalizeRates(ratesMap, responseBase, baseCode);
-  return { date: data.updated || "", rates: norm, base: baseCode };
-}
-
-// 3) exchangerate.host（免 Key 兜底）
-async function getRatesFromHost(baseCode, symbols) {
-  const url = `https://api.exchangerate.host/latest?base=${encodeURIComponent(baseCode)}&symbols=${encodeURIComponent(symbols.join(","))}`;
-  const resp = await $.http.get({ url });
-  const data = JSON.parse(resp.body || "{}");
-  return { date: data.date || "", rates: data.rates || {}, base: baseCode };
+  return { date: data.updated || "", rates: ratesMap, base: responseBase };
 }
 
 /* ========== 主流程 ========== */
@@ -105,31 +62,9 @@ async function getRatesFromHost(baseCode, symbols) {
     const source = currencyNames[base] || [base, ""];
     const wanted = Object.keys(currencyNames).filter(k => k !== base);
 
-    // 为了能进行 cross conversion（极端情况下），把 base 也加进 symbols
-    const symbolsForQuery = Array.from(new Set([...wanted, base]));
+    const symbolsForQuery = wanted; // FastForex to=参数
 
-    // 依次尝试三家源
-    const layers = [];
-
-    // 主源：CurrencyFreaks
-    try { layers.push(await getRatesFromCurrencyFreaks(base, symbolsForQuery)); } catch (_) {}
-
-    // 兜底一：FastForex
-    try { layers.push(await getRatesFromFastForex(base, symbolsForQuery)); } catch (_) {}
-
-    // 兜底二：exchangerate.host
-    try { layers.push(await getRatesFromHost(base, symbolsForQuery)); } catch (_) {}
-
-    // 合并：前者优先，缺谁补谁
-    const merged = {};
-    let firstDate = "";
-    for (const layer of layers) {
-      if (!firstDate && layer.date) firstDate = layer.date;
-      const r = layer.rates || {};
-      for (const k of wanted) {
-        if (!(k in merged) && r[k] > 0) merged[k] = r[k];
-      }
-    }
+    const { date, rates } = await getRatesFromFastForex(base, symbolsForQuery);
 
     // 排序
     const orderSet = new Set(ORDER);
@@ -140,7 +75,7 @@ async function getRatesFromHost(baseCode, symbols) {
 
     const info = sorted.reduce((acc, key) => {
       const target = currencyNames[key] || [key, ""];
-      const val = merged[key];
+      const val = rates[key];
       if (val > 0) {
         return acc + `${target[1]} 1${source[0]}兑${roundNumber(val, digits)}${target[0]}\n`;
       } else {
@@ -150,7 +85,7 @@ async function getRatesFromHost(baseCode, symbols) {
 
     $.notify(
       `[今日汇率] 基准：${source[1]} ${source[0]} (${base})`,
-      `⏰ 更新时间：${firstDate || "--"}`,
+      `⏰ 更新时间：${date || "--"}`,
       `📈 汇率情况：\n${info}`
     );
   } catch (e) {
