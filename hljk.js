@@ -1,120 +1,107 @@
 /****************************************
- * 监控汇率变化（exchangeratesapi.io/v1 + NGN 兜底）
- * 免费版只能 EUR 基准 → 自动换算成你设定的基准
- * 若主源缺 NGN（奈拉），自动用 open.er-api.com 补齐
+ * 监控汇率变化（含 NGN 兜底，免 Key）
+ * 原作者: Peng-YM  | Alter: chxm1023 | update: YangZhaocool
  ****************************************/
 
-const base   = "SGD"; // 想展示的基准：SGD / CNY / USD / NGN ...
-const digits = 3;     // 保留小数位
-const $      = API("exchange");
+const base   = "SGD"; // 基准货币：SGD / USD / CNY / NGN ...
+const digits = 3;     // 小数位
 
-// ⚠️ Access Key：可放到持久化 EXR_ACCESS_KEY，或直接写在这里
-const ACCESS_KEY = $.read("EXR_ACCESS_KEY") || "655068884c2cf03d5ecee04e87bc027e";
+const $ = API("exchange");
 
 // 展示名称与旗帜
 const currencyNames = {
-  SGD:["新加坡币","🇸🇬"], MYR:["马来西亚林吉特","🇲🇾"], USD:["美元","🇺🇸"],
-  EUR:["欧元","🇪🇺"], GBP:["英镑","🇬🇧"], CNY:["人民币","🇨🇳"], HKD:["港币","🇭🇰"],
-  JPY:["日元","🇯🇵"], KRW:["韩元","🇰🇷"], THB:["泰铢","🇹🇭"], NGN:["奈拉","🇳🇬"],
+  SGD: ["新加坡币", "🇸🇬"],
+  MYR: ["马来西亚林吉特", "🇲🇾"],
+  USD: ["美元", "🇺🇸"],
+  EUR: ["欧元", "🇪🇺"],
+  GBP: ["英镑", "🇬🇧"],
+  CNY: ["人民币", "🇨🇳"],
+  HKD: ["港币", "🇭🇰"],
+  JPY: ["日元", "🇯🇵"],
+  KRW: ["韩元", "🇰🇷"],
+  NGN: ["奈拉", "🇳🇬"], // 重点：奈拉
 };
 
-// 展示顺序（未列出的按字母序附加在末尾）
+// 自定义展示顺序（未列出的会追加在后面）
 const ORDER = ["MYR","USD","EUR","GBP","CNY","HKD","JPY","KRW","THB","VND","TRY","INR","NGN"];
 
-/* ---------- 工具 ---------- */
-function roundNumber(num, scale){
-  if(!(""+num).includes("e")) return +(Math.round(num+"e+"+scale)+"e-"+scale);
-  let arr=(""+num).split("e"), sig=""; if(+arr[1]+scale>0) sig="+";
-  return +(Math.round(+arr[0]+"e"+sig+(+arr[1]+scale))+"e-"+scale);
+// ---------- 工具 ----------
+function roundNumber(num, scale) {
+  if (!("" + num).includes("e")) {
+    return +(Math.round(num + "e+" + scale) + "e-" + scale);
+  } else {
+    let arr = ("" + num).split("e");
+    let sig = "";
+    if (+arr[1] + scale > 0) sig = "+";
+    return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
+  }
 }
 
-// EUR → 目标基准（base）的换算：1 base = ratesEUR[X]/ratesEUR[base]
-function convertFromEUR(ratesEUR, targetBase){
-  if(!ratesEUR || !ratesEUR[targetBase]) return {};
+// 主源：exchangerate-api.com
+async function getPrimaryRates(baseCode) {
+  const resp = await $.http.get({ url: `https://api.exchangerate-api.com/v4/latest/${baseCode}` });
+  const data = JSON.parse(resp.body || "{}");
+  return { date: data.date, rates: data.rates || {} };
+}
+
+// 兜底：open.er-api.com（免 Key，返回 EUR 基准），用交叉汇率补齐缺失币种
+async function fillMissingWithERApi(baseCode, missingCodes) {
+  if (!missingCodes.length) return {};
+  const resp = await $.http.get({ url: "https://open.er-api.com/v6/latest/EUR" });
+  const data = JSON.parse(resp.body || "{}");
+  const ratesEUR = (data && data.result === "success" && data.rates) ? data.rates : {};
+  if (!ratesEUR || !ratesEUR[baseCode]) return {};
+
   const out = {};
-  const rBase = ratesEUR[targetBase]; // 1 EUR = rBase targetBase
-  for(const [k,v] of Object.entries(ratesEUR)){
-    if(k===targetBase) continue;
-    if(typeof v==="number" && v>0){
-      out[k] = v / rBase;
+  const eurToBase = ratesEUR[baseCode];
+  for (const k of missingCodes) {
+    const eurToTarget = ratesEUR[k];
+    if (typeof eurToTarget === "number" && eurToTarget > 0) {
+      out[k] = eurToTarget / eurToBase; // 交叉汇率
     }
   }
   return out;
 }
 
-/* ---------- 主源：exchangeratesapi.io（免费档只能 base=EUR） ---------- */
-async function fetchEURBase(){
-  const url = `https://api.exchangeratesapi.io/v1/latest?access_key=${encodeURIComponent(ACCESS_KEY)}&base=EUR`;
-  const resp = await $.http.get({ url, headers:{ "Accept":"application/json","User-Agent":"Mozilla/5.0" } });
-  const status = resp.statusCode || 0;
-  const body   = resp.body || "";
-  let data = {};
-  try{ data = JSON.parse(body); }catch(_){}
-  if(data && data.success === false){
-    const info = data.error && (data.error.info || data.error.message || data.error.type || data.error.code) || "unknown";
-    throw new Error(`exchangeratesapi.io error: ${info}`);
-  }
-  if(!data || !data.rates){
-    throw new Error(`Invalid response status=${status} preview=${body.slice(0,120)}`);
-  }
-  return { date: data.date || "", ratesEUR: data.rates || {} };
-}
+(async () => {
+  try {
+    const source = currencyNames[base] || [base, ""];
+    const prim   = await getPrimaryRates(base);
+    const rates  = { ...prim.rates }; // 1 base -> ? target
 
-/* ---------- NGN 兜底源：open.er-api.com（免 Key，含 NGN） ---------- */
-async function fetchERApiEUR() {
-  const resp = await $.http.get({ url: "https://open.er-api.com/v6/latest/EUR" });
-  const data = JSON.parse(resp.body || "{}");
-  if (data && data.result === "success" && data.rates) {
-    return data.rates; // { USD:..., SGD:..., NGN:... }
-  }
-  return {};
-}
+    const wanted  = Object.keys(currencyNames).filter(k => k !== base);
+    const missing = wanted.filter(k => !(k in rates));
 
-// 如果主源缺 NGN，就用 open.er-api.com 交叉换算补齐： 1 base = (EUR→NGN)/(EUR→base)
-async function fillNGNIfMissing(ratesFromMain, desiredBase = base) {
-  if (ratesFromMain.NGN > 0) return ratesFromMain;
-  const eurRates = await fetchERApiEUR();
-  const eurToNGN  = eurRates.NGN;
-  const eurToBase = eurRates[desiredBase];
-  if (typeof eurToNGN === "number" && eurToNGN > 0 &&
-      typeof eurToBase === "number" && eurToBase > 0) {
-    ratesFromMain.NGN = eurToNGN / eurToBase;
-  }
-  return ratesFromMain;
-}
-
-/* ---------- 主流程 ---------- */
-(async ()=>{
-  try{
-    const wanted = Object.keys(currencyNames).filter(k=>k!==base);
-    const src    = currencyNames[base] || [base,""];
-
-    const { date, ratesEUR } = await fetchEURBase();
-    let rates = convertFromEUR(ratesEUR, base);   // 1 base -> ? target
-    rates = await fillNGNIfMissing(rates, base);  // NGN 补齐
+    // 用备用源补齐缺失（例如 NGN）
+    if (missing.length) {
+      const patched = await fillMissingWithERApi(base, missing);
+      Object.assign(rates, patched);
+    }
 
     const orderSet = new Set(ORDER);
     const sorted = [
-      ...ORDER.filter(k => k!==base && wanted.includes(k)),
+      ...ORDER.filter(k => k !== base && wanted.includes(k)),
       ...wanted.filter(k => !orderSet.has(k)).sort()
     ];
 
-    const info = sorted.map(k=>{
-      const t = currencyNames[k] || [k,""];
-      const v = rates[k];
-      return (typeof v==="number" && v>0)
-        ? `${t[1]} 1${src[0]}兑${roundNumber(v,digits)}${t[0]}`
-        : `${t[1]} ${t[0]}：暂无数据`;
-    }).join("\n");
+    const info = sorted.reduce((acc, key) => {
+      const target = currencyNames[key] || [key, ""];
+      const r = rates[key];
+      if (r > 0) {
+        return acc + `${target[1]} 1${source[0]}兑${roundNumber(r, digits)}${target[0]}\n`;
+      } else {
+        return acc + `${target[1]} ${target[0]}：暂无数据\n`;
+      }
+    }, "");
 
     $.notify(
-      `[今日汇率] 基准：${src[1]} ${src[0]} (${base})`,
-      `⏰ 更新时间：${date || "--"}`,
+      `[今日汇率] 基准：${source[1]} ${source[0]} (${base})`,
+      `⏰ 更新时间：${prim.date || "--"}`,
       `📈 汇率情况：\n${info}`
     );
-  }catch(e){
-    $.notify("[今日汇率] 错误","",String(e));
-  }finally{
+  } catch (e) {
+    $.notify("[今日汇率] 错误", "", String(e));
+  } finally {
     $.done();
   }
 })();
@@ -125,71 +112,18 @@ function HTTP(e={baseURL:""}){const{isQX:t,isLoon:s,isSurge:i,isScriptable:n,isN
 function API(e="untitled",t=!1){
   const{isQX:s,isLoon:i,isSurge:n,isNode:o,isJSBox:r,isScriptable:u}=ENV();
   return new class{
-    constructor(e,t){
-      this.name=e;this.debug=t;this.http=HTTP();this.env=ENV();
-      this.node=(()=>{if(o){return{fs:require("fs")}}return null})();
-      this.initCache();Promise.prototype.delay=function(e){return this.then(function(t){return new Promise(function(s){setTimeout(s.bind(null,t),e)})})}
-    }
-    initCache(){
-      if(s&&(this.cache=JSON.parse($prefs.valueForKey(this.name)||"{}")),(i||n)&&(this.cache=JSON.parse($persistentStore.read(this.name)||"{}")),o){
-        let e="root.json";
-        this.node.fs.existsSync(e)||this.node.fs.writeFileSync(e,JSON.stringify({}),{flag:"wx"},e=>console.log(e));
-        this.root={};e=`${this.name}.json`;
-        this.node.fs.existsSync(e)?this.cache=JSON.parse(this.node.fs.readFileSync(`${this.name}.json`)):(this.node.fs.writeFileSync(e,JSON.stringify({}),{flag:"wx"},e=>console.log(e)),this.cache={})
-      }
-    }
-    persistCache(){
-      const e=JSON.stringify(this.cache,null,2);
+    constructor(e,t){this.name=e;this.debug=t;this.http=HTTP();this.env=ENV();
+      this.node=(()=>{if(o){return{fs:require("fs")}}return null})();this.initCache();
+      Promise.prototype.delay=function(e){return this.then(function(t){return new Promise(function(s){setTimeout(s.bind(null,t),e)})})}}
+    initCache(){if(s&&(this.cache=JSON.parse($prefs.valueForKey(this.name)||"{}")),(i||n)&&(this.cache=JSON.parse($persistentStore.read(this.name)||"{}")),o){
+      let e="root.json";this.node.fs.existsSync(e)||this.node.fs.writeFileSync(e,JSON.stringify({}),{flag:"wx"},e=>console.log(e));
+      this.root={};e=`${this.name}.json`;this.node.fs.existsSync(e)?this.cache=JSON.parse(this.node.fs.readFileSync(`${this.name}.json`)):(this.node.fs.writeFileSync(e,JSON.stringify({}),{flag:"wx"},e=>console.log(e)),this.cache={})}}
+    persistCache(){const e=JSON.stringify(this.cache,null,2);
       s&&$prefs.setValueForKey(e,this.name),(i||n)&&$persistentStore.write(e,this.name),
-      o&&(this.node.fs.writeFileSync(`${this.name}.json`,e,{flag:"w"},e=>console.log(e)),this.node.fs.writeFileSync("root.json",JSON.stringify(this.root,null,2),{flag:"w"},e=>console.log(e)))
-    }
-    write(e,t){
-      this.log(`SET ${t}`);
-      if(-1!==t.indexOf("#")){
-        t=t.substr(1);
-        if(n||i)$persistentStore.write(e,t); else if(s)$prefs.setValueForKey(e,t); else if(o)this.root[t]=e
-      }else{ this.cache[t]=e }
-      this.persistCache()
-    }
-    read(e){
-      this.log(`READ ${e}`);
-      if(-1===e.indexOf("#"))return this.cache[e];
-      e=e.substr(1);
-      if(n||i)return $persistentStore.read(e);
-      if(s)return $prefs.valueForKey(e);
-      if(o)return this.root[e]
-    }
-    // ⚠️ 将 delete(e) 改名为 del(e) 以避免某些环境把 'delete' 识别为保留字报错
-    del(e){
-      this.log(`DELETE ${e}`);
-      if(-1!==e.indexOf("#")){
-        e=e.substr(1);
-        if(n||i)$persistentStore.write(null,e);
-        else if(s)$prefs.removeValueForKey(e);
-        else if(o)delete this.root[e]
-      }else{
-        delete this.cache[e]
-      }
-      this.persistCache()
-    }
-    notify(e,t="",l="",h={}){
-      const a=h["open-url"],c=h["media-url"];
-      if(s&&$notify(e,t,l,h),n&&$notification.post(e,t,l+`${c?"\n多媒体:${c}":""}`,{url:a}),i){
-        let s={}; if(a)s.openUrl=a; if(c)s.mediaUrl=c;
-        if(JSON.stringify(s)!=="{}")$notification.post(e,t,l,s); else $notification.post(e,t,l)
-      }
-      if(o||u){
-        const s=l+(a?`\n点击跳转: ${a}`:"")+(c?`\n多媒体: ${c}`:"");
-        if(r){require("push").schedule({title:e,body:(t?t+"\n":"")+s})}
-        else console.log(`${e}\n${t}\n${s}\n\n`)
-      }
-    }
-    log(e){this.debug&&console.log(`[${this.name}] LOG: ${this.stringify(e)}`)}
-    info(e){console.log(`[${this.name}] INFO: ${this.stringify(e)}`)}
-    error(e){console.log(`[${this.name}] ERROR: ${this.stringify(e)}`)}
-    wait(e){return new Promise(t=>setTimeout(t,e))}
-    done(e={}){ if(s||i||n)$done(e); else if(o&&!r&&"undefined"!=typeof $context){$context.headers=e.headers;$context.statusCode=e.statusCode;$context.body=e.body} }
-    stringify(e){ if("string"==typeof e||e instanceof String)return e; try{return JSON.stringify(e,null,2)}catch(e){return"[object Object]"} }
-  }(e,t)
-}
+      o&&(this.node.fs.writeFileSync(`${this.name}.json`,e,{flag:"w"},e=>console.log(e)),this.node.fs.writeFileSync("root.json",JSON.stringify(this.root,null,2),{flag:"w"},e=>console.log(e)))} 
+    write(e,t){this.log(`SET ${t}`);if(-1!==t.indexOf("#")){t=t.substr(1);if(n||i)$persistentStore.write(e,t);else if(s)$prefs.setValueForKey(e,t);else if(o)this.root[t]=e}else{this.cache[t]=e}this.persistCache()} 
+    read(e){this.log(`READ ${e}`);if(-1===e.indexOf("#"))return this.cache[e];e=e.substr(1);if(n||i)return $persistentStore.read(e);if(s)return $prefs.valueForKey(e);if(o)return this.root[e]} 
+    del(e){this.log(`DELETE ${e}`);if(-1!==e.indexOf("#")){e=e.substr(1);if(n||i)$persistentStore.write(null,e);else if(s)$prefs.removeValueForKey(e);else if(o)delete this.root[e]}else{delete this.cache[e]}this.persistCache()} 
+    notify(e,t="",l="",h={}){const a=h["open-url"],c=h["media-url"];if(s&&$notify(e,t,l,h),n&&$notification.post(e,t,l+`${c?"\n多媒体:${c}":""}`,{url:a}),i){let s={};if(a)s.openUrl=a;if(c)s.mediaUrl=c;if(JSON.stringify(s)!=="{}")$notification.post(e,t,l,s);else $notification.post(e,t,l)}if(o||u){const s=l+(a?`\n点击跳转: ${a}`:"")+(c?`\n多媒体: ${c}`:"");if(r){require("push").schedule({title:e,body:(t?t+"\n":"")+s})}else console.log(`${e}\n${t}\n${s}\n\n`)}} 
+    log(e){this.debug&&console.log(`[${this.name}] LOG: ${this.stringify(e)}`)} info(e){console.log(`[${this.name}] INFO: ${this.stringify(e)}`)} error(e){console.log(`[${this.name}] ERROR: ${this.stringify(e)}`)} wait(e){return new Promise(t=>setTimeout(t,e))} done(e={}){if(s||i||n)$done(e);else if(o&&!r&&"undefined"!=typeof $context){$context.headers=e.headers;$context.statusCode=e.statusCode;$context.body=e.body}} stringify(e){if("string"==typeof e||e instanceof String)return e;try{return JSON.stringify(e,null,2)}catch(e){return"[object Object]"}}}(e,t)}
 /*****************************************************************************/
