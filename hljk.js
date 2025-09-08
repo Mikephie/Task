@@ -1,6 +1,7 @@
 /****************************************
- * 监控汇率变化（exchangeratesapi.io/v1 · EUR基准自动换算）
+ * 监控汇率变化（exchangeratesapi.io/v1 + NGN 兜底）
  * 免费版只能 EUR 基准，这里会自动换算成你想要的基准
+ * NGN 若主源缺失，自动从 open.er-api.com 补齐
  ****************************************/
 
 const base   = "SGD"; // 想展示的基准：SGD / CNY / USD / NGN ...
@@ -60,6 +61,29 @@ async function fetchEURBase(){
   return { date: data.date || "", ratesEUR: data.rates || {} };
 }
 
+/* 兜底源：open.er-api.com（免 Key，含 NGN） */
+async function fetchERApiEUR() {
+  const resp = await $.http.get({ url: "https://open.er-api.com/v6/latest/EUR" });
+  const data = JSON.parse(resp.body || "{}");
+  if (data && data.result === "success" && data.rates) {
+    return data.rates; // { USD:1.1, SGD:1.45, NGN:... }
+  }
+  return {};
+}
+
+// 如果主源缺 NGN，就用 open.er-api.com 交叉换算补齐
+async function fillNGNIfMissing(ratesFromMain, desiredBase = base) {
+  if (ratesFromMain.NGN > 0) return ratesFromMain;
+  const eurRates = await fetchERApiEUR();
+  const eurToNGN = eurRates.NGN;
+  const eurToBase = eurRates[desiredBase];
+  if (typeof eurToNGN === "number" && eurToNGN > 0 &&
+      typeof eurToBase === "number" && eurToBase > 0) {
+    ratesFromMain.NGN = eurToNGN / eurToBase;
+  }
+  return ratesFromMain;
+}
+
 /* 主流程 */
 (async ()=>{
   try{
@@ -67,7 +91,8 @@ async function fetchEURBase(){
     const src    = currencyNames[base] || [base,""];
 
     const { date, ratesEUR } = await fetchEURBase();
-    const rates = convertFromEUR(ratesEUR, base);
+    let rates = convertFromEUR(ratesEUR, base);
+    rates = await fillNGNIfMissing(rates, base); // NGN 补齐
 
     const orderSet = new Set(ORDER);
     const sorted = [
