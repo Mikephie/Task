@@ -1,13 +1,15 @@
 /****************************************
  * 监控汇率变化（CurrencyFreaks 主源 + exchangerate.host 兜底）
+ * 原作者: Peng-YM | Alter: chxm1023 | update: YangZhaocool
+ * 加强：支持 NGN；主源缺值或限流时自动兜底
  ****************************************/
 
 const base   = "SGD"; // 基准货币：SGD / USD / CNY / NGN ...
-const digits = 3;     // 小数位
+const digits = 3;     // 小数位显示
 
 const $ = API("exchange");
 
-// 你的 CurrencyFreaks API Key（如需改为持久化可删此常量，见文末说明）
+// ---- 你的 CurrencyFreaks API Key（如要改为持久化，见文末说明）----
 const CF_KEY = "5c9ea957495c432b8afcb17f04b1e890";
 
 // 展示名称与旗帜
@@ -25,10 +27,10 @@ const currencyNames = {
   VND: ["越南盾", "🇻🇳"],
   TRY: ["土耳其里拉", "🇹🇷"],
   INR: ["印度卢比", "🇮🇳"],
-  NGN: ["奈拉", "🇳🇬"], // ← 关键
+  NGN: ["奈拉", "🇳🇬"], // 关键：奈拉
 };
 
-// 展示顺序（未列出的会排后面）
+// 展示顺序（未列出的会接在后面）
 const ORDER = ["MYR","USD","EUR","GBP","CNY","HKD","JPY","KRW","THB","VND","TRY","INR","NGN"];
 
 /* ========== 工具 ========== */
@@ -36,9 +38,8 @@ function roundNumber(num, scale) {
   if (!("" + num).includes("e")) {
     return +(Math.round(num + "e+" + scale) + "e-" + scale);
   } else {
-    let arr = ("" + num).split("e");
-    let sig = "";
-    if (+arr[1] + scale > 0) sig = "+";
+    const arr = ("" + num).split("e");
+    const sig = (+arr[1] + scale > 0) ? "+" : "";
     return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
   }
 }
@@ -50,25 +51,27 @@ function normalizeRates(ratesMap, responseBase, desiredBase) {
   if (responseBase === desiredBase) return { ...ratesMap };
   const rDesired = ratesMap[desiredBase];
   if (!rDesired || rDesired <= 0) return out;
-  for (const [k, v] of Object.entries(ratesMap)) {
+  for (const k of Object.keys(ratesMap)) {
     if (k === desiredBase) continue;
+    const v = ratesMap[k];
     if (v > 0) out[k] = v / rDesired;
   }
   return out;
 }
 
 /* ========== 数据源 ========== */
-// 主源：CurrencyFreaks
+// 主源：CurrencyFreaks（支持 NGN）
 async function getFromCF(baseCode, symbols) {
+  if (!CF_KEY) return { date: "", rates: {} };
   const url = `https://api.currencyfreaks.com/latest?apikey=${encodeURIComponent(CF_KEY)}&base=${encodeURIComponent(baseCode)}&symbols=${encodeURIComponent(symbols.join(","))}`;
   const resp = await $.http.get({ url });
   const data = JSON.parse(resp.body || "{}");
-  const responseBase = data.base || baseCode;
+  const responseBase = data.base || baseCode; // 某些套餐可能强制 USD，这里统一归一化
   const norm = normalizeRates(data.rates || {}, responseBase, baseCode);
   return { date: data.date || "", rates: norm };
 }
 
-// 兜底：exchangerate.host（免 Key）
+// 兜底：exchangerate.host（免 Key，拉全量更稳）
 async function getFromHost(baseCode) {
   const url = `https://api.exchangerate.host/latest?base=${encodeURIComponent(baseCode)}`;
   const resp = await $.http.get({ url });
@@ -82,23 +85,30 @@ async function getFromHost(baseCode) {
     const source = currencyNames[base] || [base, ""];
     const wanted = Object.keys(currencyNames).filter(k => k !== base);
 
-    // 为了可做 cross conversion，把 base 也放进 symbols
+    // 为便于 cross conversion，把 base 本身也加入 symbols
     const symbols = Array.from(new Set([...wanted, base]));
 
-    // 先 CF，缺谁用 host 补
-    let { date, rates } = await getFromCF(base, symbols).catch(() => ({ date:"", rates:{} }));
-    if (!rates || Object.keys(rates).length === 0) {
-      // CF 全挂，再拿 host 全量
-      const h = await getFromHost(base);
-      date = date || h.date;
-      rates = h.rates || {};
-    } else {
-      // CF 有部分，补 host 缺失
-      const h = await getFromHost(base).catch(() => ({ date:"", rates:{} }));
-      for (const k of wanted) if (!(k in rates) && h.rates && h.rates[k] > 0) rates[k] = h.rates[k];
-      if (!date) date = h.date || "";
+    // 先试 CF
+    let cf = { date: "", rates: {} };
+    try { cf = await getFromCF(base, symbols); } catch (_) {}
+
+    // 如 CF 没数据或缺项，再用 host 补齐
+    let finalDate = cf.date || "";
+    let finalRates = { ...(cf.rates || {}) };
+
+    let host = { date: "", rates: {} };
+    try { host = await getFromHost(base); } catch (_) {}
+
+    if (!finalDate && host.date) finalDate = host.date;
+
+    // 用 host 补缺
+    for (const k of wanted) {
+      if (!(k in finalRates) && host.rates && host.rates[k] > 0) {
+        finalRates[k] = host.rates[k];
+      }
     }
 
+    // 排序并生成文本
     const orderSet = new Set(ORDER);
     const sorted = [
       ...ORDER.filter(k => k !== base && wanted.includes(k)),
@@ -107,7 +117,7 @@ async function getFromHost(baseCode) {
 
     const info = sorted.reduce((acc, key) => {
       const target = currencyNames[key] || [key, ""];
-      const val = rates[key];
+      const val = finalRates[key];
       if (val > 0) {
         return acc + `${target[1]} 1${source[0]}兑${roundNumber(val, digits)}${target[0]}\n`;
       } else {
@@ -117,7 +127,7 @@ async function getFromHost(baseCode) {
 
     $.notify(
       `[今日汇率] 基准：${source[1]} ${source[0]} (${base})`,
-      `⏰ 更新时间：${date || "--"}`,
+      `⏰ 更新时间：${finalDate || "--"}`,
       `📈 汇率情况：\n${info}`
     );
   } catch (e) {
@@ -128,7 +138,124 @@ async function getFromHost(baseCode) {
 })();
 
 /*********************************** API *************************************/
-function ENV(){const e="undefined"!=typeof $task,t="undefined"!=typeof $loon,s="undefined"!=typeof $httpClient&&!t,i="function"==typeof require&&"undefined"!=typeof $jsbox;return{isQX:e,isLoon:t,isSurge:s,isNode:"function"==typeof require&&!i,isJSBox:i,isRequest:"undefined"!=typeof $request,isScriptable:"undefined"!=typeof importModule}}
-function HTTP(e={baseURL:""}){const{isQX:t,isLoon:s,isSurge:i,isScriptable:n,isNode:o}=ENV(),r=/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/;const u={};return["GET","POST","PUT","DELETE","HEAD","OPTIONS","PATCH"].forEach(l=>u[l.toLowerCase()]=(u=>(function(u,l){l="string"==typeof l?{url:l}:l;const h=e.baseURL;h&&!r.test(l.url||"")&&(l.url=h?h+l.url:l.url);const a=(l={...e,...l}).timeout,c={onRequest:()=>{},onResponse:e=>e,onTimeout:()=>{},...l.events};let f,d;if(c.onRequest(u,l),t)f=$task.fetch({method:u,...l});else if(s||i||o)f=new Promise((e,t)=>{(o?require("request"):$httpClient)[u.toLowerCase()](l,(s,i,n)=>{s?t(s):e({statusCode:i.status||i.statusCode,headers:i.headers,body:n})})});else if(n){const e=new Request(l.url);e.method=u;e.headers=l.headers;e.body=l.body;f=new Promise((t,s)=>{e.loadString().then(s=>{t({statusCode:e.response.statusCode,headers:e.response.headers,body:s})}).catch(e=>s(e))})}const p=a?new Promise((e,t)=>{d=setTimeout(()=>(c.onTimeout(),t(`${u} URL: ${l.url} exceeds the timeout ${a} ms`)),a)}):null;return(p?Promise.race([p,f]).then(e=>(clearTimeout(d),e)):f).then(e=>c.onResponse(e))})(l,u))),u}
-function API(e="untitled",t=!1){const{isQX:s,isLoon:i,isSurge:n,isNode:o,isJSBox:r,isScriptable:u}=ENV();return new class{constructor(e,t){this.name=e;this.debug=t;this.http=HTTP();this.env=ENV();this.node=(()=>{if(o){return{fs:require("fs")}}return null})(),this.initCache();Promise.prototype.delay=function(e){return this.then(function(t){return new Promise(function(s){setTimeout(s.bind(null,t),e)})})}}initCache(){if(s&&(this.cache=JSON.parse($prefs.valueForKey(this.name)||"{}")),(i||n)&&(this.cache=JSON.parse($persistentStore.read(this.name)||"{}")),o){let e="root.json";this.node.fs.existsSync(e)||this.node.fs.writeFileSync(e,JSON.stringify({}),{flag:"wx"},e=>console.log(e));this.root={};e=`${this.name}.json`;this.node.fs.existsSync(e)?this.cache=JSON.parse(this.node.fs.readFileSync(`${this.name}.json`)):(this.node.fs.writeFileSync(e,JSON.stringify({}),{flag:"wx"},e=>console.log(e));this.cache={})}}persistCache(){const e=JSON.stringify(this.cache,null,2);s&&$prefs.setValueForKey(e,this.name);(i||n)&&$persistentStore.write(e,this.name);o&&(this.node.fs.writeFileSync(`${this.name}.json`,e,{flag:"w"},e=>console.log(e));this.node.fs.writeFileSync("root.json",JSON.stringify(this.root,null,2),{flag:"w"},e=>console.log(e)))}write(e,t){this.log(`SET ${t}`);if(-1!==t.indexOf("#")){t=t.substr(1);if(n||i)$persistentStore.write(e,t);else if(s)$prefs.setValueForKey(e,t);else if(o)this.root[t]=e}else{this.cache[t]=e}this.persistCache()}read(e){this.log(`READ ${e}`);if(-1===e.indexOf("#"))return this.cache[e];e=e.substr(1);if(n||i)return $persistentStore.read(e);if(s)return $prefs.valueForKey(e);if(o)return this.root[e]}delete(e){this.log(`DELETE ${e}`);if(-1!==e.indexOf("#")){e=e.substr(1);if(n||i)$persistentStore.write(null,e);else if(s)$prefs.removeValueForKey(e);else if(o)delete this.root[e]}else{delete this.cache[e]}this.persistCache()}notify(e,t="",l="",h={}){const a=h["open-url"],c=h["media-url"];if(s&&$notify(e,t,l,h),n&&$notification.post(e,t,l+`${c?"\n多媒体:${c}":""}`,{url:a}),i){let s={};if(a)s.openUrl=a;if(c)s.mediaUrl=c;if(JSON.stringify(s)!=="{}")$notification.post(e,t,l,s);else $notification.post(e,t,l)}if(o||u){const s=l+(a?`\n点击跳转: ${a}`:"")+(c?`\n多媒体: ${c}`:"");if(r){require("push").schedule({title:e,body:(t?t+"\n":"")+s})}else console.log(`${e}\n${t}\n${s}\n\n`)}}log(e){this.debug&&console.log(`[${this.name}] LOG: ${this.stringify(e)}`)}info(e){console.log(`[${this.name}] INFO: ${this.stringify(e)}`)}error(e){console.log(`[${this.name}] ERROR: ${this.stringify(e)}`)}wait(e){return new Promise(t=>setTimeout(t,e))}done(e={}){if(s||i||n)$done(e);else if(o&&!r&&"undefined"!=typeof $context){$context.headers=e.headers;$context.statusCode=e.statusCode;$context.body=e.body}}stringify(e){if("string"==typeof e||e instanceof String)return e;try{return JSON.stringify(e,null,2)}catch(e){return"[object Object]"}}}(e,t)}
+function ENV(){
+  const isQX  = typeof $task !== "undefined";
+  const isLoon= typeof $loon !== "undefined";
+  const isSurge = typeof $httpClient !== "undefined" && !isLoon;
+  const isNode  = typeof require === "function" && typeof $jsbox === "undefined";
+  const isJSBox = typeof $jsbox !== "undefined";
+  const isRequest = typeof $request !== "undefined";
+  const isScriptable = typeof importModule !== "undefined";
+  return { isQX, isLoon, isSurge, isNode, isJSBox, isRequest, isScriptable };
+}
+function HTTP(opts = { baseURL: "" }){
+  const { isQX, isLoon, isSurge, isScriptable, isNode } = ENV();
+  const u = {};
+  ["GET","POST","PUT","DELETE","HEAD","OPTIONS","PATCH"].forEach((m)=>{
+    u[m.toLowerCase()] = (cfg) => {
+      cfg = (typeof cfg === "string") ? { url: cfg } : cfg;
+      const url = opts.baseURL && cfg.url && !/^https?:\/\//i.test(cfg.url) ? opts.baseURL + cfg.url : (cfg.url || "");
+      const timeout = cfg.timeout;
+      const headers = cfg.headers || {};
+      const body = cfg.body;
+
+      const onResponse = (resp) => resp;
+      let reqPromise;
+      if (isQX) {
+        reqPromise = $task.fetch({ method: m, url, headers, body });
+      } else if (isLoon || isSurge || isNode) {
+        reqPromise = new Promise((resolve, reject)=>{
+          const client = isNode ? require("request") : $httpClient;
+          client[m.toLowerCase()]({ url, headers, body }, (err, resp, data)=>{
+            if (err) reject(err);
+            else resolve({ statusCode: resp.status || resp.statusCode, headers: resp.headers, body: data });
+          });
+        });
+      } else if (isScriptable) {
+        const req = new Request(url);
+        req.method = m;
+        req.headers = headers;
+        if (body) req.body = body;
+        reqPromise = req.loadString().then((data)=>({
+          statusCode: req.response.statusCode,
+          headers: req.response.headers,
+          body: data
+        }));
+      } else {
+        reqPromise = Promise.reject(new Error("Unsupported runtime"));
+      }
+
+      if (timeout) {
+        return Promise.race([
+          reqPromise.then(onResponse),
+          new Promise((_, rej)=>setTimeout(()=>rej(new Error(`Timeout ${timeout}ms`)), timeout))
+        ]);
+      }
+      return reqPromise.then(onResponse);
+    };
+  });
+  return u;
+}
+function API(name = "untitled", debug = false){
+  const { isQX, isLoon, isSurge, isNode, isJSBox } = ENV();
+  return new (class {
+    constructor(name, debug){
+      this.name = name;
+      this.debug = debug;
+      this.http = HTTP();
+      this.env = ENV();
+      this.cache = {};
+      this.root = {};
+      if (isQX) {
+        try { this.cache = JSON.parse($prefs.valueForKey(this.name) || "{}"); } catch(_) {}
+      } else if (isLoon || isSurge) {
+        try { this.cache = JSON.parse($persistentStore.read(this.name) || "{}"); } catch(_) {}
+      }
+    }
+    read(key){
+      if (key.startsWith("#")) {
+        const k = key.slice(1);
+        if (isLoon || isSurge) return $persistentStore.read(k);
+        if (isQX) return $prefs.valueForKey(k);
+        return undefined;
+      }
+      return this.cache[key];
+    }
+    write(value, key){
+      if (key.startsWith("#")) {
+        const k = key.slice(1);
+        if (isLoon || isSurge) return $persistentStore.write(value, k);
+        if (isQX) return $prefs.setValueForKey(value, k);
+        return false;
+      }
+      this.cache[key] = value;
+      const str = JSON.stringify(this.cache, null, 2);
+      if (isQX) $prefs.setValueForKey(str, this.name);
+      if (isLoon || isSurge) $persistentStore.write(str, this.name);
+      return true;
+    }
+    notify(title, sub = "", body = "", opts = {}){
+      const openUrl = opts["open-url"];
+      const mediaUrl = opts["media-url"];
+      if (isQX) $notify(title, sub, body, opts);
+      else if (isLoon) $notification.post(title, sub, body, openUrl ? { openUrl } : {});
+      else if (isSurge) $notification.post(title, sub, body);
+      else console.log(`${title}\n${sub}\n${body}`);
+    }
+    log(...args){ if (this.debug) console.log(`[${this.name}]`, ...args); }
+    done(obj = {}){
+      if (isQX || isLoon || isSurge) $done(obj);
+    }
+  })(name, debug);
+}
 /*****************************************************************************/
+
+/* ========== 可选：更安全的 Key 存法 ==========
+1) 先运行一次（单独的小脚本）保存 Key：
+   $persistentStore.write("5c9ea957495c432b8afcb17f04b1e890","EX_API_CF_KEY"); $done();
+
+2) 然后把上面的
+   const CF_KEY = "5c9ea957495c432b8afcb17f04b1e890";
+   改成
+   const CF_KEY = $.read("EX_API_CF_KEY") || "";
+================================================ */
