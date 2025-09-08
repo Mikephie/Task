@@ -1,93 +1,90 @@
 /****************************************
- * 监控汇率变化（APILayer 版，含 NGN）
- * 原作者: Peng-YM | Alter: chxm1023 | update: YangZhaocool
- * 数据源: https://api.exchangerate.host (APILayer)
+ * 监控汇率变化（APILayer·EUR基准自动换算版）
+ * 原作者: Peng-YM | Alter: chxm1023 | 强化: 自动换算 + 容错 + NGN
  ****************************************/
 
-const base   = "SGD"; // 基准货币：SGD / USD / CNY / NGN ...
-const digits = 3;     // 小数位
+const base   = "SGD"; // 你想展示的基准：SGD / CNY / USD / NGN ...
+const digits = 3;     // 保留小数位
 const $      = API("exchange");
 
-/* === Access Key 设置 ===
- * 优先读取持久化：$persistentStore.read("EXR_ACCESS_KEY")
- * 读不到则回退到内联 KEY（你提供的）
+/* === Access Key ===
+ * 优先读持久化 EXR_ACCESS_KEY；没有就用下面这个你给的 Key
+ * 可在调试台写入：$persistentStore.write("YOUR_KEY","EXR_ACCESS_KEY")
  */
-const ACCESS_KEY = $.read("EXR_ACCESS_KEY") || "mPleBAc08k2r9Ae3kzJmMru8YeYHXPaq";
+const ACCESS_KEY = $.read("EXR_ACCESS_KEY") || "655068884c2cf03d5eee04e87bc027e";
 
 // 展示名称与旗帜
 const currencyNames = {
-  SGD: ["新加坡币", "🇸🇬"],
-  MYR: ["马来西亚林吉特", "🇲🇾"],
-  USD: ["美元", "🇺🇸"],
-  EUR: ["欧元", "🇪🇺"],
-  GBP: ["英镑", "🇬🇧"],
-  CNY: ["人民币", "🇨🇳"],
-  HKD: ["港币", "🇭🇰"],
-  JPY: ["日元", "🇯🇵"],
-  KRW: ["韩元", "🇰🇷"],
-  THB: ["泰铢", "🇹🇭"],
-  VND: ["越南盾", "🇻🇳"],
-  TRY: ["土耳其里拉", "🇹🇷"],
-  INR: ["印度卢比", "🇮🇳"],
-  NGN: ["奈拉", "🇳🇬"], // 重点：奈拉
+  SGD:["新加坡币","🇸🇬"], MYR:["马来西亚林吉特","🇲🇾"], USD:["美元","🇺🇸"],
+  EUR:["欧元","🇪🇺"], GBP:["英镑","🇬🇧"], CNY:["人民币","🇨🇳"], HKD:["港币","🇭🇰"],
+  JPY:["日元","🇯🇵"], KRW:["韩元","🇰🇷"], THB:["泰铢","🇹🇭"], VND:["越南盾","🇻🇳"],
+  TRY:["土耳其里拉","🇹🇷"], INR:["印度卢比","🇮🇳"], NGN:["奈拉","🇳🇬"],
 };
 
-// 自定义展示顺序（未列出的会追加在后面）
+// 自定义展示顺序（未列出的会排在最后，按字母序）
 const ORDER = ["MYR","USD","EUR","GBP","CNY","HKD","JPY","KRW","THB","VND","TRY","INR","NGN"];
 
-/* ========== 工具 ========== */
-function roundNumber(num, scale) {
-  if (!("" + num).includes("e")) {
-    return +(Math.round(num + "e+" + scale) + "e-" + scale);
-  } else {
-    let arr = ("" + num).split("e");
-    let sig = "";
-    if (+arr[1] + scale > 0) sig = "+";
-    return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
-  }
+/* ========== 小工具 ========== */
+function roundNumber(num, scale){
+  if(!(""+num).includes("e")) return +(Math.round(num+"e+"+scale)+"e-"+scale);
+  let arr=(""+num).split("e"), sig=""; if(+arr[1]+scale>0) sig="+";
+  return +(Math.round(+arr[0]+"e"+sig+(+arr[1]+scale))+"e-"+scale);
 }
 
-/* ========== APILayer（exchangerate.host）请求 ========== */
-async function getRatesFromAPILayer(baseCode) {
-  const url = `https://api.exchangerate.host/latest?access_key=${encodeURIComponent(ACCESS_KEY)}&base=${encodeURIComponent(baseCode)}`;
-  const resp = await $.http.get({ url, headers: { "Accept":"application/json", "User-Agent":"Mozilla/5.0" } });
+// 把"EUR 基准"的 rates 换算为 "base 基准"
+function convertFromEUR(ratesEUR, targetBase){
+  if(!ratesEUR || !ratesEUR[targetBase]) return {};
+  const out = {};
+  const rBase = ratesEUR[targetBase]; // 1 EUR = rBase targetBase
+  // 我们要 1 targetBase = ? X
+  // 已知：1 targetBase = (1 / rBase) EUR；则 1 targetBase = ratesEUR[X] / rBase (X 为任意币)
+  for(const [k,v] of Object.entries(ratesEUR)){
+    if(k===targetBase) continue;
+    if(typeof v==="number" && v>0){
+      out[k] = v / rBase;
+    }
+  }
+  return out;
+}
+
+/* ========== 请求 EUR 基准的数据（APILayer 免费档） ========== */
+async function fetchEURBase(){
+  const url = `https://api.exchangerate.host/latest?access_key=${encodeURIComponent(ACCESS_KEY)}&base=EUR`;
+  const resp = await $.http.get({ url, headers:{ "Accept":"application/json","User-Agent":"Mozilla/5.0" } });
   const status = resp.statusCode || 0;
   const body   = resp.body || "";
-
   let data = {};
-  try { data = JSON.parse(body); } catch (_) {}
-
-  // APILayer 异常结构：{ success:false, error:{ code, type, info } }
-  if (data && data.success === false) {
+  try{ data = JSON.parse(body); }catch(_){}
+  if(data && data.success === false){
     const info = data.error && (data.error.info || data.error.type || data.error.code) || "unknown";
     throw new Error(`APILayer error: ${info}`);
   }
-  if (!data || !data.rates) {
+  if(!data || !data.rates){
     throw new Error(`Invalid response status=${status} preview=${body.slice(0,100)}`);
   }
-  return { date: data.date || "", rates: data.rates || {} };
+  return { date: data.date || "", ratesEUR: data.rates || {} };
 }
 
 /* ========== 主流程 ========== */
-(async () => {
-  try {
-    const wanted = Object.keys(currencyNames).filter(k => k !== base);
-    const src    = currencyNames[base] || [base, ""];
+(async ()=>{
+  try{
+    const wanted = Object.keys(currencyNames).filter(k=>k!==base);
+    const src    = currencyNames[base] || [base,""];
 
-    const { date, rates } = await getRatesFromAPILayer(base);
+    const { date, ratesEUR } = await fetchEURBase();
+    const rates = convertFromEUR(ratesEUR, base); // 1 base -> ? target
 
-    // 排序
     const orderSet = new Set(ORDER);
     const sorted = [
-      ...ORDER.filter(k => k !== base && wanted.includes(k)),
+      ...ORDER.filter(k => k!==base && wanted.includes(k)),
       ...wanted.filter(k => !orderSet.has(k)).sort()
     ];
 
-    const info = sorted.map(k => {
-      const t = currencyNames[k] || [k, ""];
+    const info = sorted.map(k=>{
+      const t = currencyNames[k] || [k,""];
       const v = rates[k];
-      return (typeof v === "number" && v > 0)
-        ? `${t[1]} 1${src[0]}兑${roundNumber(v, digits)}${t[0]}`
+      return (typeof v==="number" && v>0)
+        ? `${t[1]} 1${src[0]}兑${roundNumber(v,digits)}${t[0]}`
         : `${t[1]} ${t[0]}：暂无数据（源未提供）`;
     }).join("\n");
 
@@ -96,9 +93,9 @@ async function getRatesFromAPILayer(baseCode) {
       `⏰ 更新时间：${date || "--"}`,
       `📈 汇率情况：\n${info}`
     );
-  } catch (e) {
-    $.notify("[今日汇率] 错误", "", String(e));
-  } finally {
+  }catch(e){
+    $.notify("[今日汇率] 错误","",String(e));
+  }finally{
     $.done();
   }
 })();
