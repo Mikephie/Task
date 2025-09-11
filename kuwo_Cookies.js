@@ -4,8 +4,9 @@
 获取Cookies方式: 
     需要在网页酷我音乐上登陆，登陆成功后自动获取Cookies！
     更新登录信息后禁用脚本!
+
 [Script]
-http-request ^https?:\/\/appi\.kuwo\.cn\/(api\/automobile\/kuwo\/v1\/configuration\/signature|openapi\/v1\/www\/search\/searchKey) script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kuwo_Cookies.js, requires-body=true, timeout=60, enabled=false, tag=酷我音乐【(时长)(积分)】获取Cookies, img-url=https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png
+http-request ^https:\/\/.*\/(newh5app\/singers\/0\?|openapi\/v1\/www\/search\/searchKey\?) script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kuwo_Cookies.js, requires-body=true, timeout=60, enabled=false, tag=酷我音乐【(时长)(积分)】获取Cookies, images-url=https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png
 [MITM]
 hostname = *.kuwo.cn
 
