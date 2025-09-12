@@ -6,7 +6,7 @@
     更新登录信息后禁用脚本!
 
 [Script]
-http-request ^https:\/\/.*\/(newh5app\/singers\/0\?|openapi\/v1\/www\/search\/searchKey\?) script-path=https://raw.githubusercontent.com/Mikephie/Task/main/kuwo_Cookies.js, requires-body=true, timeout=60, enabled=false, tag=酷我音乐【(时长)(积分)】获取Cookies, images-url=https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png
+http-request ^https:\/\/.*\/(newh5app\/singers\/0\?|openapi\/v1\/www\/search\/searchKey\?) script-path=https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/kuwo_Cookies.js, requires-body=true, timeout=60, enabled=false, tag=酷我音乐【(时长)(积分)】获取Cookies, images-url=https://raw.githubusercontent.com/deezertidal/private/main/icons/kuwosvip.png
 [MITM]
 hostname = *.kuwo.cn
 

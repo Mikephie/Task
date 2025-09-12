@@ -31,11 +31,11 @@
       "scripts": [
         {
           "name": "酷我音乐（时长）",
-          "script": "https://raw.githubusercontent.com/Mikephie/Task/main/kuwomusic.js"
+          "script": "https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/kuwomusic.js"
         },
         {
           "name": "酷我音乐（积分）",
-          "script": "https://raw.githubusercontent.com/Mikephie/Task/main/kuwo.js"
+          "script": "https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/kuwo.js"
         }
       ],
       "icons": [
@@ -82,7 +82,7 @@
           "desc": ""
         }
       ],
-      "script": "https://raw.githubusercontent.com/Mikephie/Task/main/QQreader.js",
+      "script": "https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/QQreader.js",
       "icons": [
         "https://raw.githubusercontent.com/General74110/Scripts/master/img/qqreader.png",
         "https://raw.githubusercontent.com/General74110/Scripts/master/img/qqreader.png"
@@ -124,7 +124,7 @@
         "https://raw.githubusercontent.com/Yuheng0101/X/main/Assets/52pojie.png",
         "https://raw.githubusercontent.com/Yuheng0101/X/main/Assets/52pojie.png"
       ],
-      "script": "https://raw.githubusercontent.com/Mikephie/Task/main/52pojie.js"
+      "script": "https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/52pojie.js"
     },
     {
       "id": "Auto_join_TF",

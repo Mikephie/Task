@@ -7,7 +7,7 @@ APP：QQ阅读
 
 bug：签到任务里的看视频总是只有每天第一次的第一条有效
 
-Boxjs定阅(https://raw.githubusercontent.com/General74110/Quantumult-X/master/Boxjs/General74110.json)
+Boxjs定阅(https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/mikephieboxjs.json)
 
 操作：
 Loon:点击 【我的】 获取Cookies！获取完后关掉重写，避免不必要的MITM
@@ -22,11 +22,11 @@ QQYD_COOKIE={"ywkey":"your_ywkey","ywguid":"your_ywguid","ywtoken":"your_ywtoken
         请勿贩卖！⚠️⚠️⚠️
 
 [Script]
-http-request ^https:\/\/iostgw\.reader\.qq\.com\/v7_6_6\/userinfo\? script-path=https://raw.githubusercontent.com/General74110/Quantumult-X/master/Task/QQreader.js, timeout=10, enabled=true, tag=QQ阅读获取Cookies, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/QQ.png
+http-request ^https:\/\/iostgw\.reader\.qq\.com\/v7_6_6\/userinfo\? script-path=https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/QQreader.js, timeout=10, enabled=true, tag=QQ阅读获取Cookies, images-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/QQ.png
 
 
 [Task]
-cron "30 6 * * *" script-path=https://raw.githubusercontent.com/General74110/Quantumult-X/master/Task/QQreader.js, timeout=3600, tag=QQ阅读, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/QQ.png
+cron "30 6 * * *" script-path=https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/QQreader.js, timeout=3600, tag=QQ阅读, images-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/QQ.png
 
 
 [MITM]
