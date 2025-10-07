@@ -31,11 +31,11 @@
       "scripts": [
         {
           "name": "酷我音乐（时长）",
-          "script": "https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/kuwomusic.js"
+          "script": "https://raw.githubusercontent.com/Mikephie/Task/main/kuwomusic.js"
         },
         {
           "name": "酷我音乐（积分）",
-          "script": "https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/kuwo.js"
+          "script": "https://raw.githubusercontent.com/Mikephie/Task/main/kuwo.js"
         }
       ],
       "icons": [
@@ -46,43 +46,19 @@
     {
       "id": "QQreader",
       "name": "QQ阅读",
-      "keys": ["ywguid", "ywkey", "ywtoken", "csigs"],
+      "keys": ["QQYD_COOKIE"],
       "desc": "自动完成QQ阅读任务",
       "settings": [
         {
-          "id": "ywguid",
-          "name": "ywguid",
-          "val": "",
-          "type": "text",
-          "placeholder": "",
-          "desc": ""
-        },
-        {
-          "id": "ywkey",
-          "name": "ywkey",
-          "val": "",
-          "type": "text",
-          "placeholder": "",
-          "desc": ""
-        },
-        {
-          "id": "ywtoken",
-          "name": "ywtoken",
-          "val": "",
-          "type": "text",
-          "placeholder": "",
-          "desc": ""
-        },
-        {
-          "id": "csigs",
-          "name": "csigs",
+          "id": "QQYD_COOKIE",
+          "name": "QQ阅读Cookie",
           "val": "",
           "type": "text",
           "placeholder": "",
           "desc": ""
         }
       ],
-      "script": "https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/QQreader.js",
+      "script": "https://raw.githubusercontent.com/Mikephie/Task/main/QQreader.js",
       "icons": [
         "https://img.mikephie.site/APP_logo/qqreader-mobile.png",
         "https://img.mikephie.site/APP_logo/qqreader-mobile.png"
@@ -124,7 +100,7 @@
         "https://img.mikephie.site/APP_logo/52pojie-mobile.png",
         "https://img.mikephie.site/APP_logo/52pojie-mobile.png"
       ],
-      "script": "https://raw.githubusercontent.com/Mikephie/Task/refs/heads/main/52pojie.js"
+      "script": "https://raw.githubusercontent.com/Mikephie/Task/main/52pojie.js"
     },
     {
       "id": "Auto_join_TF",
