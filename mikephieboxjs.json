@@ -39,8 +39,8 @@
         }
       ],
       "icons": [
-        "https://img.mikephie.site/APP_logo/kuwocoin-mobile.png",
-        "https://img.mikephie.site/APP_logo/kuwocoin-mobile.png"
+        "https://img.mikephie.site/APP_logo/kuwocoin.png",
+        "https://img.mikephie.site/APP_logo/kuwocoin.png"
       ]
     },
     {
@@ -60,8 +60,8 @@
       ],
       "script": "https://raw.githubusercontent.com/Mikephie/Task/main/QQreader.js",
       "icons": [
-        "https://img.mikephie.site/APP_logo/qqreader-mobile.png",
-        "https://img.mikephie.site/APP_logo/qqreader-mobile.png"
+        "https://img.mikephie.site/APP_logo/qqreader.png",
+        "https://img.mikephie.site/APP_logo/qqreader.png"
       ]
     },
     {
@@ -97,8 +97,8 @@
       ],
       "author": "@Mikephie",
       "icons": [
-        "https://img.mikephie.site/APP_logo/52pojie-mobile.png",
-        "https://img.mikephie.site/APP_logo/52pojie-mobile.png"
+        "https://img.mikephie.site/APP_logo/52pojie.png",
+        "https://img.mikephie.site/APP_logo/52pojie.png"
       ],
       "script": "https://raw.githubusercontent.com/Mikephie/Task/main/52pojie.js"
     },
