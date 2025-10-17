@@ -66,8 +66,11 @@ async function notifySplit(title, subtitle, lines, chunk=7){
     const lines = buildLines(rates, prev, DIGITS);
     await notifySplit(`[今日汇率] 基准：新币 (SGD)`, `更新时间：${date||"--"}`, lines);
 
-    // 覆盖快照
-    $persistentStore.write(JSON.stringify(pickShow(rates)), SNAP_KEY);
+    // 【重要修改】仅在成功获取到新汇率数据时，才覆盖快照
+    if (Object.keys(rates).length > 0) {
+      $persistentStore.write(JSON.stringify(pickShow(rates)), SNAP_KEY);
+    }
+    
     $done();
   }catch(e){
     $notification.post("[今日汇率] 错误", "", String(e));
