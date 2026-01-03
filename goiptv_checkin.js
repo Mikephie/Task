@@ -1,24 +1,27 @@
 /**
- * IPTV 自动签到脚本 (Node.js 终端版)
- * 适配站点: www.go-iptv.ggff.net
- * 运行命令: node checkin.js
+ * IPTV 自动签到 - 青龙适配版
+ * 变量名: IPTV_COOKIE
  */
 
-// ================= 配置区域 =================
-// 请填入你刚才在 iMac 浏览器捕获到的完整 Cookie (eyJ... 字符串)
-const COOKIE_STR = `session=eyJ1c2VybmFtZSI6ICJtaWtlcGhpZSJ9.aVkP3A.ok6u4eGQsx8t_UXghF4BnnBq8NY; path=/; Max-Age=1209600; httponly; samesite=lax`;
-
-// 接口地址 (基于抓包确定的 PHP 后端接口)
-const LOGIN_URL = "https://www.go-iptv.ggff.net/user.php?action=checkin";
-// ===========================================
+const fetch = require('node-fetch'); // 如果青龙环境 node 版本低于 18，需要安装此依赖
 
 async function doCheckin() {
+    // 1. 从环境变量读取 Cookie
+    const cookie = process.env.IPTV_COOKIE;
+
+    if (!cookie) {
+        console.log("❌ 错误：未在青龙环境变量中找到 IPTV_COOKIE");
+        return;
+    }
+
     console.log("--- 正在启动 IPTV 签到任务 ---");
 
-    // 严格对齐图 18 中 iMac Chrome 的请求头参数
+    const loginUrl = "https://www.go-iptv.ggff.net/user.php?action=checkin";
+    
+    // 2. 依然使用你 iMac 上成功的 Headers 指纹
     const headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
-        "Cookie": COOKIE_STR.trim(),
+        "Cookie": cookie.trim(),
         "Origin": "https://www.go-iptv.ggff.net",
         "Referer": "https://www.go-iptv.ggff.net/user.html",
         "Content-Type": "application/json",
@@ -26,39 +29,29 @@ async function doCheckin() {
         "Accept": "application/json, text/javascript, */*; q=0.01",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Site": "same-origin",
-        "Sec-Fetch-Dest": "empty",
-        "Accept-Language": "en-GB,en;q=0.9,zh-TW;q=0.8,zh-CN;q=0.7,zh;q=0.6,en-US;q=0.5"
+        "Sec-Fetch-Dest": "empty"
     };
 
     try {
-        const response = await fetch(LOGIN_URL, {
+        const response = await fetch(loginUrl, {
             method: "POST",
             headers: headers,
-            body: JSON.stringify({}) // 发送空负载，对应 Content-Length: 2
+            body: JSON.stringify({})
         });
 
-        const status = response.status;
         const text = await response.text();
-
-        console.log(`服务器状态码: ${status}`);
+        console.log(`服务器返回状态码: ${response.status}`);
         console.log(`原始响应内容: ${text}`);
 
-        if (status === 200) {
-            if (text.includes("NOT_LOGGED_IN")) {
-                console.log("❌ 错误：Cookie 格式正确但已失效，请重新登录网页抓取");
-            } else {
-                try {
-                    const resJson = JSON.parse(text);
-                    console.log(`✅ 签到成功！结果内容: ${JSON.stringify(resJson)}`);
-                } catch (e) {
-                    console.log("✅ 签到请求已成功发送");
-                }
-            }
+        if (text.includes('"ok":true')) {
+            console.log("✅ 签到成功！");
+        } else if (text.includes("NOT_LOGGED_IN")) {
+            console.log("❌ 失败：Cookie 已失效，请更新环境变量");
         } else {
-            console.log(`❌ 签到异常，错误代码: ${status}`);
+            console.log("⚠️ 响应异常，请检查日志");
         }
     } catch (error) {
-        console.error(`❌ 脚本运行崩溃: ${error.message}`);
+        console.error(`❌ 运行崩溃: ${error.message}`);
     }
 }
 
