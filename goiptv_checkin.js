@@ -1,9 +1,10 @@
 /**
- * IPTV 自动签到 - 零依赖原生版
+ * IPTV 自动签到 - 豪华通知版
  * 变量名称: IPTV_COOKIE
  */
 
 const https = require('https');
+const notify = require('./sendNotify'); // 必须确保同目录下有 sendNotify.js
 
 const IPTV_COOKIE = process.env.IPTV_COOKIE;
 
@@ -13,7 +14,9 @@ async function doCheckin() {
         return;
     }
 
-    console.log("--- 正在启动 IPTV 签到任务 (原生 HTTPS 模式) ---");
+    console.log("🚀 开始执行 IPTV 签到任务...");
+    let title = "📺 IPTV 签到助手";
+    let content = "";
 
     const options = {
         hostname: 'www.go-iptv.ggff.net',
@@ -25,38 +28,60 @@ async function doCheckin() {
             "Origin": "https://www.go-iptv.ggff.net",
             "Referer": "https://www.go-iptv.ggff.net/user.html",
             "Content-Type": "application/json",
-            "X-Requested-With": "XMLHttpRequest",
-            "Accept": "application/json, text/javascript, */*; q=0.01",
-            "Sec-Fetch-Mode": "cors",
-            "Sec-Fetch-Site": "same-origin",
-            "Sec-Fetch-Dest": "empty"
+            "X-Requested-With": "XMLHttpRequest"
         }
     };
 
-    const req = https.request(options, (res) => {
-        let data = '';
-        res.on('data', (chunk) => { data += chunk; });
-        res.on('end', () => {
-            console.log(`服务器状态码: ${res.statusCode}`);
-            console.log(`原始响应内容: ${data}`);
+    return new Promise((resolve) => {
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => { data += chunk; });
+            res.on('end', async () => {
+                console.log(`[Log] 状态码: ${res.statusCode}`);
+                
+                try {
+                    const resJson = JSON.parse(data);
+                    const today = new Date().toLocaleDateString();
 
-            if (data.includes('"ok":true')) {
-                console.log("✅ 签到成功！");
-            } else if (data.includes("already")) {
-                console.log("✅ 今天已经签到过了");
-            } else {
-                console.log("⚠️ 签到异常，请检查响应内容");
-            }
+                    if (resJson.ok === true) {
+                        const statusEmoji = resJson.already ? "🔁" : "✅";
+                        const statusText = resJson.already ? "今日已签过" : "签到成功";
+                        
+                        // 组装美观的内容
+                        content = `
+----------------------------
+${statusEmoji} **结果**: ${statusText}
+💰 **金币**: ${resJson.coins} (+${resJson.bonus})
+🔥 **连签**: ${resJson.streak} 天
+📅 **日期**: ${resJson.today}
+----------------------------
+✨ 任务已完成，祝您今天愉快！`;
+                        
+                        console.log(content);
+                        await notify.sendNotify(title, content);
+                    } else {
+                        content = `⚠️ 签到异常\n响应内容: ${data}`;
+                        console.log(content);
+                        await notify.sendNotify(title, content);
+                    }
+                } catch (e) {
+                    content = `❌ 解析错误\n状态码: ${res.statusCode}\n返回: ${data}`;
+                    console.log(content);
+                    await notify.sendNotify(title, content);
+                }
+                resolve();
+            });
         });
-    });
 
-    req.on('error', (e) => {
-        console.error(`❌ 请求崩溃: ${e.message}`);
-    });
+        req.on('error', async (e) => {
+            console.error(`❌ 请求崩溃: ${e.message}`);
+            await notify.sendNotify(title, `❌ 网络请求失败: ${e.message}`);
+            resolve();
+        });
 
-    // 发送空 JSON 体 {}
-    req.write(JSON.stringify({}));
-    req.end();
+        req.write(JSON.stringify({}));
+        req.end();
+    });
 }
 
 doCheckin();
