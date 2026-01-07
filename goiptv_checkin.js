@@ -1,22 +1,18 @@
 /**
- * IPTV 自动签到 - 环境自适应增强版 (Surge & 青龙)
- * 兼容变量: IPTV_COOKIE
+ * IPTV 自动签到 - 增强兼容版
+ * 修复：针对服务器返回 "Object of type coroutine is not JSON serializable" 的兼容处理
  */
 
 const isSurge = typeof $httpClient !== "undefined";
 const isNode = typeof process !== "undefined" && !isSurge;
 
-// --- 环境适配器 ---
 const $ = {
     name: "IPTV 签到助手",
     cookieKey: "iptv_cookie_storage",
-    // 自动获取 Cookie：Surge 优先读持久化，青龙读环境变量
     cookie: isSurge ? ($persistentStore.read("iptv_cookie_storage") || "") : (process.env.IPTV_COOKIE || ""),
     
-    // 通知适配：支持 (标题, 副标题, 内容)
     notify: async (title, subtitle, content) => {
         if (isSurge) {
-            // Surge 支持三段式通知
             $notification.post(title, subtitle, content);
         } else if (isNode) {
             const fullMsg = `【${title}】${subtitle}\n${content}`;
@@ -24,13 +20,10 @@ const $ = {
             try {
                 const notify = require('./sendNotify');
                 await notify.sendNotify(title, fullMsg);
-            } catch (e) {
-                // 仅在 Node 环境打印日志
-            }
+            } catch (e) {}
         }
     },
 
-    // HTTP 请求适配
     post: (options) => {
         return new Promise((resolve, reject) => {
             if (isSurge) {
@@ -59,29 +52,20 @@ const $ = {
         });
     },
 
-    done: () => {
-        if (isSurge) $done();
-    }
+    done: () => { if (isSurge) $done(); }
 };
 
 async function run() {
     console.log(`🚀 开始执行 ${$.name} [${isSurge ? "Surge" : "Node.js"}]`);
-
     if (!$.cookie) {
-        await $.notify($.name, "❌ 错误", "未找到 IPTV_COOKIE，请检查环境变量或持久化数据");
+        await $.notify($.name, "❌ 错误", "未找到 IPTV_COOKIE");
         $.done();
         return;
     }
-
-    // 支持多账号分割 (换行或 &)
     const cookieList = $.cookie.split(/[&\n]+/).filter(x => !!x);
-    
     for (let i = 0; i < cookieList.length; i++) {
-        const currentCookie = cookieList[i].trim();
-        console.log(`\n📦 正在处理第 ${i + 1}/${cookieList.length} 个账号...`);
-        await doCheckin(currentCookie, i + 1);
+        await doCheckin(cookieList[i].trim(), i + 1);
     }
-
     $.done();
 }
 
@@ -101,29 +85,38 @@ async function doCheckin(cookie, index) {
 
     try {
         const resp = await $.post(options);
-        const resJson = JSON.parse(resp.body);
+        
+        // --- 新增：防御性逻辑 ---
+        if (resp.body.includes("coroutine is not JSON serializable")) {
+            console.log(`⚠️ 账号(${index})：服务器返回协程序列化错误，通常签到已成功，请稍后查看结果。`);
+            await $.notify($.name, `账号(${index})：⚠️ 服务器响应异常`, "签到指令已发出，但服务器后端崩溃。建议稍后在网页端确认积分是否增加。");
+            return;
+        }
+
+        let resJson;
+        try {
+            resJson = JSON.parse(resp.body);
+        } catch (parseErr) {
+            throw new Error(`非法 JSON 响应: ${resp.body.substring(0, 100)}`);
+        }
 
         if (resJson.ok === true) {
             const statusEmoji = resJson.already ? "🔁" : "✅";
             const statusText = resJson.already ? "今日已签过" : "签到成功";
-            
-            // 组装详细内容
             const subtitle = `账号(${index})：${statusText} ${statusEmoji}`;
             const detail = `💰 积分: ${resJson.coins} (+${resJson.bonus})\n🔥 连签: ${resJson.streak} 天\n📅 日期: ${resJson.today}`;
             
             console.log(`${subtitle}\n${detail}`);
-
-            // Surge 环境下如果是新获取的 Cookie（比如手动更新过），自动同步到持久化
             if (isSurge && cookie !== $persistentStore.read($.cookieKey)) {
                 $persistentStore.write(cookie, $.cookieKey);
             }
-
             await $.notify($.name, subtitle, detail);
         } else {
-            await $.notify($.name, `账号(${index}) ❌ 签到异常`, `返回内容: ${resp.body}`);
+            await $.notify($.name, `账号(${index}) ❌ 签到失败`, `返回: ${resp.body}`);
         }
     } catch (e) {
-        await $.notify($.name, `账号(${index}) ❌ 网络错误`, e.message || "请求失败");
+        console.log(`❌ 运行异常: ${e.message}`);
+        await $.notify($.name, `账号(${index}) ❌ 网络/系统解析错误`, e.message);
     }
 }
 

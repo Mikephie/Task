@@ -1,87 +1,130 @@
 /**
- * IPTV 自动签到 - 豪华通知版
- * 变量名称: IPTV_COOKIE (需包含 session=eyJ...)
+ * IPTV 自动签到 - 环境自适应增强版 (Surge & 青龙)
+ * 兼容变量: IPTV_COOKIE
  */
 
-const https = require('https');
-// 尝试加载通知模块
-let notify;
-try { notify = require('./sendNotify'); } catch (e) { notify = null; }
+const isSurge = typeof $httpClient !== "undefined";
+const isNode = typeof process !== "undefined" && !isSurge;
 
-const IPTV_COOKIE = process.env.IPTV_COOKIE;
+// --- 环境适配器 ---
+const $ = {
+    name: "IPTV 签到助手",
+    cookieKey: "iptv_cookie_storage",
+    // 自动获取 Cookie：Surge 优先读持久化，青龙读环境变量
+    cookie: isSurge ? ($persistentStore.read("iptv_cookie_storage") || "") : (process.env.IPTV_COOKIE || ""),
+    
+    // 通知适配：支持 (标题, 副标题, 内容)
+    notify: async (title, subtitle, content) => {
+        if (isSurge) {
+            // Surge 支持三段式通知
+            $notification.post(title, subtitle, content);
+        } else if (isNode) {
+            const fullMsg = `【${title}】${subtitle}\n${content}`;
+            console.log(fullMsg);
+            try {
+                const notify = require('./sendNotify');
+                await notify.sendNotify(title, fullMsg);
+            } catch (e) {
+                // 仅在 Node 环境打印日志
+            }
+        }
+    },
 
-async function doCheckin() {
-    if (!IPTV_COOKIE) {
-        console.log("❌ 错误：未在环境变量中找到 IPTV_COOKIE");
+    // HTTP 请求适配
+    post: (options) => {
+        return new Promise((resolve, reject) => {
+            if (isSurge) {
+                $httpClient.post(options, (err, resp, body) => {
+                    if (err) reject(err);
+                    else resolve({ status: resp.status, body });
+                });
+            } else {
+                const https = require('https');
+                const url = new URL(options.url);
+                const reqOptions = {
+                    hostname: url.hostname,
+                    path: url.pathname + url.search,
+                    method: 'POST',
+                    headers: options.headers
+                };
+                const req = https.request(reqOptions, (res) => {
+                    let data = '';
+                    res.on('data', chunk => data += chunk);
+                    res.on('end', () => resolve({ status: res.statusCode, body: data }));
+                });
+                req.on('error', reject);
+                if (options.body) req.write(options.body);
+                req.end();
+            }
+        });
+    },
+
+    done: () => {
+        if (isSurge) $done();
+    }
+};
+
+async function run() {
+    console.log(`🚀 开始执行 ${$.name} [${isSurge ? "Surge" : "Node.js"}]`);
+
+    if (!$.cookie) {
+        await $.notify($.name, "❌ 错误", "未找到 IPTV_COOKIE，请检查环境变量或持久化数据");
+        $.done();
         return;
     }
 
-    console.log("🚀 开始执行 IPTV 签到任务...");
-    const title = "📺 IPTV 签到助手";
-    let content = "";
+    // 支持多账号分割 (换行或 &)
+    const cookieList = $.cookie.split(/[&\n]+/).filter(x => !!x);
+    
+    for (let i = 0; i < cookieList.length; i++) {
+        const currentCookie = cookieList[i].trim();
+        console.log(`\n📦 正在处理第 ${i + 1}/${cookieList.length} 个账号...`);
+        await doCheckin(currentCookie, i + 1);
+    }
 
+    $.done();
+}
+
+async function doCheckin(cookie, index) {
     const options = {
-        hostname: 'www.go-iptv.ggff.net',
-        path: '/user.php?action=checkin',
-        method: 'POST',
+        url: 'https://www.go-iptv.ggff.net/user.php?action=checkin',
         headers: {
-            // 严格对齐你 iMac 测试成功的指纹
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
-            "Cookie": IPTV_COOKIE.trim(),
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            "Cookie": cookie,
             "Origin": "https://www.go-iptv.ggff.net",
             "Referer": "https://www.go-iptv.ggff.net/user.html",
             "Content-Type": "application/json",
-            "X-Requested-With": "XMLHttpRequest",
-            "Accept": "application/json, text/javascript, */*; q=0.01"
-        }
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: "{}"
     };
 
-    return new Promise((resolve) => {
-        const req = https.request(options, (res) => {
-            let data = '';
-            res.on('data', (chunk) => { data += chunk; });
-            res.on('end', async () => {
-                try {
-                    const resJson = JSON.parse(data);
-                    if (resJson.ok === true) {
-                        const isAlready = resJson.already === true;
-                        const statusEmoji = isAlready ? "🔁" : "✅";
-                        const statusText = isAlready ? "任务已达标 (今日已签)" : "今日签到成功";
-                        
-                        content = `
-----------------------------
-${statusEmoji} **结果**: ${statusText}
-💰 **金币**: ${resJson.coins} (今日+${resJson.bonus || 0})
-🔥 **连签**: ${resJson.streak} 天
-📅 **日期**: ${resJson.today}
-----------------------------
-✨ 凭证状态：有效 (Active)
-`;
-                        console.log(content);
-                        if (notify) await notify.sendNotify(title, content);
-                    } else {
-                        content = `⚠️ 签到异常: ${resJson.error || '未知错误'}`;
-                        console.log(content);
-                        if (notify) await notify.sendNotify(title, content);
-                    }
-                } catch (e) {
-                    content = `❌ 解析崩溃: ${data}`;
-                    console.log(content);
-                    if (notify) await notify.sendNotify(title, content);
-                }
-                resolve();
-            });
-        });
+    try {
+        const resp = await $.post(options);
+        const resJson = JSON.parse(resp.body);
 
-        req.on('error', async (e) => {
-            console.error(`❌ 网络错误: ${e.message}`);
-            if (notify) await notify.sendNotify(title, `❌ 网络错误: ${e.message}`);
-            resolve();
-        });
+        if (resJson.ok === true) {
+            const statusEmoji = resJson.already ? "🔁" : "✅";
+            const statusText = resJson.already ? "今日已签过" : "签到成功";
+            
+            // 组装详细内容
+            const subtitle = `账号(${index})：${statusText} ${statusEmoji}`;
+            const detail = `💰 积分: ${resJson.coins} (+${resJson.bonus})\n🔥 连签: ${resJson.streak} 天\n📅 日期: ${resJson.today}`;
+            
+            console.log(`${subtitle}\n${detail}`);
 
-        req.write(JSON.stringify({}));
-        req.end();
-    });
+            // Surge 环境下如果是新获取的 Cookie（比如手动更新过），自动同步到持久化
+            if (isSurge && cookie !== $persistentStore.read($.cookieKey)) {
+                $persistentStore.write(cookie, $.cookieKey);
+            }
+
+            await $.notify($.name, subtitle, detail);
+        } else {
+            await $.notify($.name, `账号(${index}) ❌ 签到异常`, `返回内容: ${resp.body}`);
+        }
+    } catch (e) {
+        await $.notify($.name, `账号(${index}) ❌ 网络错误`, e.message || "请求失败");
+    }
 }
 
-doCheckin();
+run();
