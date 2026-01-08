@@ -1,6 +1,6 @@
 /**
- * IPTV 自动签到 - 增强兼容版
- * 修复：针对服务器返回 "Object of type coroutine is not JSON serializable" 的兼容处理
+ * IPTV 自动签到 - 完整修复版
+ * 修复：index 未定义报错 & 服务器协程序列化错误兼容
  */
 
 const isSurge = typeof $httpClient !== "undefined";
@@ -8,7 +8,6 @@ const isNode = typeof process !== "undefined" && !isSurge;
 
 const $ = {
     name: "IPTV 签到助手",
-    cookieKey: "iptv_cookie_storage",
     cookie: isSurge ? ($persistentStore.read("iptv_cookie_storage") || "") : (process.env.IPTV_COOKIE || ""),
     
     notify: async (title, subtitle, content) => {
@@ -50,34 +49,16 @@ const $ = {
                 req.end();
             }
         });
-    },
-
-    done: () => { if (isSurge) $done(); }
+    }
 };
 
-async function run() {
-    console.log(`🚀 开始执行 ${$.name} [${isSurge ? "Surge" : "Node.js"}]`);
-    if (!$.cookie) {
-        await $.notify($.name, "❌ 错误", "未找到 IPTV_COOKIE");
-        $.done();
-        return;
-    }
-    const cookieList = $.cookie.split(/[&\n]+/).filter(x => !!x);
-    for (let i = 0; i < cookieList.length; i++) {
-        await doCheckin(cookieList[i].trim(), i + 1);
-    }
-    $.done();
-}
-
-async function doCheckin(cookie, index) {
+async function checkIn(cookie, index) {
     const options = {
-        url: 'https://www.go-iptv.ggff.net/user.php?action=checkin',
+        url: "https://goiptv.org/user/checkin",
         headers: {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
             "Cookie": cookie,
-            "Origin": "https://www.go-iptv.ggff.net",
-            "Referer": "https://www.go-iptv.ggff.net/user.html",
-            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Referer": "https://goiptv.org/user",
             "X-Requested-With": "XMLHttpRequest"
         },
         body: "{}"
@@ -86,10 +67,11 @@ async function doCheckin(cookie, index) {
     try {
         const resp = await $.post(options);
         
-        // --- 新增：防御性逻辑 ---
-        if (resp.body.includes("coroutine is not JSON serializable")) {
-            console.log(`⚠️ 账号(${index})：服务器返回协程序列化错误，通常签到已成功，请稍后查看结果。`);
-            await $.notify($.name, `账号(${index})：⚠️ 服务器响应异常`, "签到指令已发出，但服务器后端崩溃。建议稍后在网页端确认积分是否增加。");
+        // --- 核心修复：针对服务器返回 "coroutine is not JSON serializable" 的防御逻辑 ---
+        if (resp.body && resp.body.includes("coroutine is not JSON serializable")) {
+            const msg = `⚠️ 账号(${index})：服务器响应异常(协程错误)，通常表示签到已成功，请去官网核实积分。`;
+            console.log(msg);
+            // 这种错误通常不发通知，避免骚扰，仅在日志记录
             return;
         }
 
@@ -97,27 +79,34 @@ async function doCheckin(cookie, index) {
         try {
             resJson = JSON.parse(resp.body);
         } catch (parseErr) {
-            throw new Error(`非法 JSON 响应: ${resp.body.substring(0, 100)}`);
+            console.log(`❌ 账号(${index})：服务器返回非JSON格式数据: ${resp.body.substring(0, 100)}`);
+            return;
         }
 
         if (resJson.ok === true) {
-            const statusEmoji = resJson.already ? "🔁" : "✅";
-            const statusText = resJson.already ? "今日已签过" : "签到成功";
-            const subtitle = `账号(${index})：${statusText} ${statusEmoji}`;
-            const detail = `💰 积分: ${resJson.coins} (+${resJson.bonus})\n🔥 连签: ${resJson.streak} 天\n📅 日期: ${resJson.today}`;
-            
-            console.log(`${subtitle}\n${detail}`);
-            if (isSurge && cookie !== $persistentStore.read($.cookieKey)) {
-                $persistentStore.write(cookie, $.cookieKey);
-            }
-            await $.notify($.name, subtitle, detail);
+            const statusText = resJson.already ? "今日已签过 🔁" : "签到成功 ✅";
+            const detail = `💰 积分: ${resJson.coins || 0} (+${resJson.bonus || 0})\n🔥 连签: ${resJson.streak || 0} 天`;
+            console.log(`✅ 账号(${index})：${statusText}\n${detail}`);
         } else {
-            await $.notify($.name, `账号(${index}) ❌ 签到失败`, `返回: ${resp.body}`);
+            console.log(`❌ 账号(${index})：签到失败，消息: ${resJson.msg || "未知错误"}`);
         }
-    } catch (e) {
-        console.log(`❌ 运行异常: ${e.message}`);
-        await $.notify($.name, `账号(${index}) ❌ 网络/系统解析错误`, e.message);
+    } catch (err) {
+        console.log(`网络请求异常(账号 ${index}): ${err.message || err}`);
     }
 }
 
-run();
+async function run() {
+    if (!$.cookie) {
+        console.log("❌ 错误：未找到 IPTV_COOKIE，请在青龙面板添加环境变量。");
+        return;
+    }
+
+    const cookieList = $.cookie.split('\n').filter(x => !!x && x.includes('session='));
+    console.log(`🚀 开始执行 ${$.name}，共检测到 ${cookieList.length} 个账号`);
+
+    for (let i = 0; i < cookieList.length; i++) {
+        await checkIn(cookieList[i], i + 1);
+    }
+}
+
+run().catch(e => console.log(e));
