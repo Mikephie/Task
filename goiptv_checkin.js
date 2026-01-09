@@ -1,112 +1,116 @@
 /**
- * IPTV 自动签到 - 完整修复版
- * 修复：index 未定义报错 & 服务器协程序列化错误兼容
+ * IPTV 自动签到 - 智能双平台适配版（Surge + QingLong）
+ * 运行时自动检测环境，选择对应 HTTP / 通知 / 结束方式
  */
 
+// ===== 环境检测 =====
 const isSurge = typeof $httpClient !== "undefined";
-const isNode = typeof process !== "undefined" && !isSurge;
+const isQingLong = typeof process !== "undefined" && process.env;
 
-const $ = {
-    name: "IPTV 签到助手",
-    cookie: isSurge ? ($persistentStore.read("iptv_cookie_storage") || "") : (process.env.IPTV_COOKIE || ""),
-    
-    notify: async (title, subtitle, content) => {
-        if (isSurge) {
-            $notification.post(title, subtitle, content);
-        } else if (isNode) {
-            const fullMsg = `【${title}】${subtitle}\n${content}`;
-            console.log(fullMsg);
-            try {
-                const notify = require('./sendNotify');
-                await notify.sendNotify(title, fullMsg);
-            } catch (e) {}
-        }
-    },
-
-    post: (options) => {
-        return new Promise((resolve, reject) => {
-            if (isSurge) {
-                $httpClient.post(options, (err, resp, body) => {
-                    if (err) reject(err);
-                    else resolve({ status: resp.status, body });
-                });
-            } else {
-                const https = require('https');
-                const url = new URL(options.url);
-                const reqOptions = {
-                    hostname: url.hostname,
-                    path: url.pathname + url.search,
-                    method: 'POST',
-                    headers: options.headers
-                };
-                const req = https.request(reqOptions, (res) => {
-                    let data = '';
-                    res.on('data', chunk => data += chunk);
-                    res.on('end', () => resolve({ status: res.statusCode, body: data }));
-                });
-                req.on('error', reject);
-                if (options.body) req.write(options.body);
-                req.end();
-            }
-        });
-    }
-};
-
-async function checkIn(cookie, index) {
-    const options = {
-        url: "https://goiptv.org/user/checkin",
-        headers: {
-            "Cookie": cookie,
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Referer": "https://goiptv.org/user",
-            "X-Requested-With": "XMLHttpRequest"
-        },
-        body: "{}"
-    };
-
-    try {
-        const resp = await $.post(options);
-        
-        // --- 核心修复：针对服务器返回 "coroutine is not JSON serializable" 的防御逻辑 ---
-        if (resp.body && resp.body.includes("coroutine is not JSON serializable")) {
-            const msg = `⚠️ 账号(${index})：服务器响应异常(协程错误)，通常表示签到已成功，请去官网核实积分。`;
-            console.log(msg);
-            // 这种错误通常不发通知，避免骚扰，仅在日志记录
-            return;
-        }
-
-        let resJson;
-        try {
-            resJson = JSON.parse(resp.body);
-        } catch (parseErr) {
-            console.log(`❌ 账号(${index})：服务器返回非JSON格式数据: ${resp.body.substring(0, 100)}`);
-            return;
-        }
-
-        if (resJson.ok === true) {
-            const statusText = resJson.already ? "今日已签过 🔁" : "签到成功 ✅";
-            const detail = `💰 积分: ${resJson.coins || 0} (+${resJson.bonus || 0})\n🔥 连签: ${resJson.streak || 0} 天`;
-            console.log(`✅ 账号(${index})：${statusText}\n${detail}`);
-        } else {
-            console.log(`❌ 账号(${index})：签到失败，消息: ${resJson.msg || "未知错误"}`);
-        }
-    } catch (err) {
-        console.log(`网络请求异常(账号 ${index}): ${err.message || err}`);
-    }
+// ===== HTTP 客户端适配 =====
+let httpPost;
+if (isQingLong) {
+  // 青龙用 axios
+  const axios = require("axios");
+  httpPost = (url, headers, body) => axios.post(url, body, { headers });
+} else if (isSurge) {
+  // Surge 用 $httpClient.post
+  httpPost = (url, headers, body) =>
+    new Promise((resolve, reject) => {
+      $httpClient.post({ url, headers, body: JSON.stringify(body) }, (err, res, data) => {
+        if (err) reject(err);
+        else resolve({ res, data });
+      });
+    });
 }
 
+// ===== 本地存储 Key =====
+const COOKIE_KEY = "iptv_cookie_storage";
+
+// ===== 通知适配 =====
+function notify(title, subtitle, content) {
+  if (isSurge) {
+    $notification.post(title, subtitle, content);
+  }
+  console.log(`\n🔔 ${title}\n📌 ${subtitle}\n📝 ${content}`);
+}
+
+// ===== 结束适配 =====
+function done(result = {}) {
+  if (isSurge) {
+    $done(result);
+  }
+  if (isQingLong) {
+    process.exit(0);
+  }
+}
+
+// ===== 主逻辑 =====
 async function run() {
-    if (!$.cookie) {
-        console.log("❌ 错误：未找到 IPTV_COOKIE，请在青龙面板添加环境变量。");
-        return;
-    }
+  // 读取 persistentStore 里的 Cookie 并打印
+  let storedCookie = null;
+  if (isSurge) {
+    storedCookie = $persistentStore.read(COOKIE_KEY);
+  } else if (isQingLong) {
+    storedCookie = process.env.IPTV_COOKIE;
+  }
 
-    const cookieList = $.cookie.split('\n').filter(x => !!x && x.includes('session='));
-    console.log(`🚀 开始执行 ${$.name}，共检测到 ${cookieList.length} 个账号`);
+  console.log("\n================ COOKIE ================");
+  console.log(storedCookie);
+  console.log("=======================================\n");
 
-    for (let i = 0; i < cookieList.length; i++) {
-        await checkIn(cookieList[i], i + 1);
+  // --- Cookie 捕获分支（仅 Rewrite 触发时生效）---
+  if (isSurge && typeof $request !== "undefined") {
+    const ck = $request.headers["Cookie"] || $request.headers["cookie"];
+    console.log("[IPTV] 检测到请求头 Cookie:", ck);
+
+    if (ck && ck.includes("session=")) {
+      $persistentStore.write(ck, COOKIE_KEY);
+      console.log("Cookie 已保存到 Surge persistentStore");
+
+      notify("IPTV 签到助手", "✅ Cookie 捕获成功", ck);
     }
+    return done({});
+  }
+
+  // --- 签到分支（手动运行 or Cron 触发）---
+  if (!storedCookie) {
+    console.log("❌ 未找到可用 Cookie，终止签到");
+    return done();
+  }
+
+  console.log("🚀 进入签到模式...");
+
+  try {
+    const { data } = await httpPost(
+      "https://www.go-iptv.ggff.net/user.php?action=checkin",
+      {
+        "User-Agent": "Mozilla/5.0",
+        "Cookie": storedCookie,
+        "Referer": "https://www.go-iptv.ggff.net/user.html",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      {}
+    );
+
+    console.log("📩 签到响应:", data);
+
+    if (data.includes("coroutine is not JSON serializable")) {
+      console.log("⚠ 可能已签到成功（协程错误提示）");
+      notify("IPTV", "⚠ 签到可能已成功", data);
+    } else {
+      const res = JSON.parse(data);
+      if (res.ok) {
+        notify("IPTV", "✅ 签到成功", `积分: ${res.coins} (+${res.bonus})`);
+      } else {
+        console.log("❌ 签到失败:", res.msg);
+      }
+    }
+  } catch (err) {
+    console.log("❌ 签到请求失败:", err.message);
+  }
+
+  done();
 }
 
-run().catch(e => console.log(e));
+run();
